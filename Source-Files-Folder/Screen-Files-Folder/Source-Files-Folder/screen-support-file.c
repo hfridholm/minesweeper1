@@ -205,9 +205,7 @@ bool extract_symbol_image(Surface** image, Square square)
     return true;
   }
 
-  *image = IMG_Load(filename);
-
-  return (*image != NULL);
+  return extract_file_image(image, filename);
 }
 
 char* adjacentFiles[] = {"one-symbol.png", "two-symbol.png", "three-symbol.png", "four-symbol.png", "five-symbol.png", "six-symbol.png", "seven-symbol.png", "eight-symbol.png"};
@@ -242,9 +240,7 @@ bool extract_square_image(Surface** image, Square square)
     return false;
   }
 
-  *image = IMG_Load(filename);
-
-  return (*image != NULL);
+  return extract_file_image(image, filename);
 }
 
 bool extract_file_font(Font** font, char filePath[], int size)
@@ -321,6 +317,85 @@ bool render_screen_text(Screen screen, char text[], Color color, int width, int 
 	SDL_DestroyTexture(message);
 
 	TTF_CloseFont(textFont);
+
+	return true;
+}
+
+bool render_board_options(Screen screen)
+{
+	SDL_RenderClear(screen.render);
+
+	uint16_t relativeBoardWidth = 100;
+	uint16_t relativeBoardHeight = 200;
+
+	float boardMargin = 0.1;
+
+	uint16_t relativeTotalWidth = ((relativeBoardWidth * 3) + (boardMargin * relativeBoardWidth * 2));
+	uint16_t relativeTotalHeight = relativeBoardHeight;
+
+	float widthRel = ((float) screen.width / (float) relativeTotalWidth);
+	float heightRel = ((float) screen.height / (float) relativeTotalHeight);
+
+	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
+
+	uint16_t totalHeight = relativeTotalHeight * sizeFactor;
+	uint16_t totalWidth = relativeTotalWidth * sizeFactor;
+
+	uint16_t height = (screen.height - totalHeight) / 2;
+	uint16_t width = (screen.width - totalWidth) / 2;
+
+	uint16_t boardHeight = (relativeBoardHeight * sizeFactor);
+	uint16_t boardWidth = (relativeBoardWidth * sizeFactor);
+
+	Rect stupidPosition = {width + 0, height, boardWidth, boardHeight};
+
+	Rect normalPosition = {width + boardWidth + (boardMargin * boardWidth), height, boardWidth, boardHeight};
+
+	Rect expertPosition = {width + (2 * boardWidth) + (2 * boardMargin * boardWidth), height, boardWidth, boardHeight};
+
+	//printf("Render stupid\n");
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", stupidPosition);
+
+	//printf("Render normal\n");
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", normalPosition);
+
+	//printf("Render expert\n");
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", expertPosition);
+
+	return true;
+}
+
+bool extract_file_image(Surface** image, char filePath[])
+{
+	*image = IMG_Load(filePath);
+
+  return (*image != NULL);
+}
+
+bool render_file_image(Screen screen, char filePath[], Rect position)
+{
+	Surface* image;
+
+	if(!extract_file_image(&image, filePath))
+	{
+		return false;
+	}
+
+	return render_screen_image(screen, image, position);
+}
+
+bool render_screen_image(Screen screen, Surface* image, Rect position)
+{
+	Texture* texture = NULL;
+
+	if(!make_surface_texture(&texture, screen.render, image))
+	{
+		return false;
+	}
+
+	SDL_RenderCopy(screen.render, texture, NULL, &position);
+
+	SDL_DestroyTexture(texture);
 
 	return true;
 }

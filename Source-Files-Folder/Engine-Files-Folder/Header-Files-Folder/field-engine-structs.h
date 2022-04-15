@@ -23,6 +23,10 @@ typedef struct Board
   int mines;
 } Board;
 
+#define STUPID_BOARD (Board) {9, 9, 10};
+#define NORMAL_BOARD (Board) {16, 16, 40};
+#define EXPERT_BOARD (Board) {16, 30, 99};
+
 typedef Square** Field;
 
 #endif

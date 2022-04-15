@@ -34,4 +34,12 @@ bool render_screen_text(Screen, char[], Color, int, int, float);
 
 bool extract_file_font(Font**, char[], int);
 
+bool render_board_options(Screen);
+
+bool extract_file_image(Surface**, char[]);
+
+bool render_file_image(Screen, char[], Rect);
+
+bool render_screen_image(Screen, Surface*, Rect);
+
 #endif

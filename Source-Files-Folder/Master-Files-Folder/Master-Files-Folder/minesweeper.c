@@ -1,10 +1,6 @@
 
 #include "../Header-Files-Folder/master-include-file.h"
 
-#define STUPID_BOARD (Board) {9, 9, 10};
-#define NORMAL_BOARD (Board) {16, 16, 40};
-#define EXPERT_BOARD (Board) {16, 30, 99};
-
 bool game_still_running(bool* result, Field field, Board board)
 {
   if(mine_field_cleared(field, board))
@@ -75,7 +71,28 @@ int main(int argAmount, char* arguments[])
 {
   srand(time(NULL));
 
-  const Board board = NORMAL_BOARD;
+  Screen screen;
+
+  if(!setup_screen_struct(&screen, "minesweeper", 1280, 720))
+  {
+    printf("Could not setup_display_screen!\n");
+
+    return false;
+  }
+
+
+  Board board;
+
+
+  if(!input_screen_board(&board, &screen))
+  {
+    printf("could not input board!\n");
+
+    free_screen_struct(screen);
+
+    return false;
+  }
+
 
   Field field = create_field_matrix(board.height, board.width);
 
@@ -88,14 +105,6 @@ int main(int argAmount, char* arguments[])
     return false;
   }
 
-  Screen screen;
-
-  if(!setup_screen_struct(&screen, "minesweeper", 1280, 720))
-  {
-    printf("Could not setup_display_screen!\n");
-
-    return false;
-  }
 
   bool result = false;
 
