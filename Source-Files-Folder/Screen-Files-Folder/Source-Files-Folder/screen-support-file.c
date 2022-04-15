@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-bool setup_display_screen(Screen* screen, const char title[])
+bool setup_screen_struct(Screen* screen, char title[])
 {
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -15,14 +15,14 @@ bool setup_display_screen(Screen* screen, const char title[])
 		return false;
 	}
 
-	if(!create_screen_window(&screen->window, screen->height, screen->width, title))
+	if(!make_screen_window(&screen->window, screen->height, screen->width, title))
 	{
 		SDL_Quit();
 
 		return false;
 	}
 
-	if(!create_window_surface(&screen->surface, screen->window))
+	if(!make_window_surface(&screen->surface, screen->window))
 	{
 		SDL_DestroyWindow(screen->window);
 
@@ -31,7 +31,7 @@ bool setup_display_screen(Screen* screen, const char title[])
 		return false;
 	}
 
-	if(!create_surface_renderer(&screen->renderer, screen->surface))
+	if(!make_surface_render(&screen->render, screen->surface))
 	{
 		SDL_FreeSurface(screen->surface);
 
@@ -45,37 +45,37 @@ bool setup_display_screen(Screen* screen, const char title[])
 	return true;
 }
 
-bool create_surface_texture(Texture** texture, Renderer* renderer, Surface* surface)
+bool make_surface_texture(Texture** texture, Render* render, Surface* surface)
 {
-  *texture = SDL_CreateTextureFromSurface(renderer, surface);
+  *texture = SDL_CreateTextureFromSurface(render, surface);
 
 	return (texture != NULL);
 }
 
-bool create_surface_renderer(Renderer** renderer, Surface* surface)
+bool make_surface_render(Render** render, Surface* surface)
 {
-  *renderer = SDL_CreateSoftwareRenderer(surface);
+  *render = SDL_CreateSoftwareRenderer(surface);
 
-	return (*renderer != NULL);
+	return (*render != NULL);
 }
 
-bool create_window_surface(Surface** surface, Window* window)
+bool make_window_surface(Surface** surface, Window* window)
 {
   *surface = SDL_GetWindowSurface(window);
 
 	return (*surface != NULL);
 }
 
-bool create_screen_window(Window** window, const int height, const int width, const char title[])
+bool make_screen_window(Window** window, int height, int width, char title[])
 {
   *window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
 
 	return (*window != NULL);
 }
 
-void free_display_screen(Screen screen)
+void free_screen_struct(Screen screen)
 {
-	SDL_DestroyRenderer(screen.renderer);
+	SDL_DestroyRenderer(screen.render);
 
 	SDL_FreeSurface(screen.surface);
 
@@ -84,7 +84,7 @@ void free_display_screen(Screen screen)
 	SDL_Quit();
 }
 
-bool render_mine_field(Screen screen, Field field, const Board board)
+bool render_mine_field(Screen screen, Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -109,12 +109,12 @@ bool render_mine_field(Screen screen, Field field, const Board board)
     }
   }
 
-  SDL_RenderPresent(screen.renderer);
+  SDL_RenderPresent(screen.render);
 
   return true;
 }
 
-bool render_field_square(Screen screen, const Board board, const Point point, const Square square)
+bool render_field_square(Screen screen, Board board, Point point, Square square)
 {
   Surface* image = NULL;
 
@@ -127,14 +127,14 @@ bool render_field_square(Screen screen, const Board board, const Point point, co
 
   Rect position;
 
-  if(!screen_field_position(&position, screen, board, point))
+  if(!screen_field_point(&position, screen, board, point))
   {
     SDL_FreeSurface(image);
 
     return false;
   }
 
-  if(!render_surface_texture(screen.renderer, image, position))
+  if(!render_surface_texture(screen.render, image, position))
   {
     SDL_FreeSurface(image);
 
@@ -146,7 +146,7 @@ bool render_field_square(Screen screen, const Board board, const Point point, co
   return true;
 }
 
-bool screen_field_position(Rect* position, Screen screen, const Board board, const Point point)
+bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
 {
   if(!point_inside_board(point, board)) return false;
 
@@ -172,7 +172,7 @@ bool screen_field_position(Rect* position, Screen screen, const Board board, con
   return true;
 }
 
-bool render_field_symbol(Screen screen, const Board board, const Point point, const Square square)
+bool render_field_symbol(Screen screen, Board board, Point point, Square square)
 {
   Surface* image = NULL;
 
@@ -192,14 +192,14 @@ bool render_field_symbol(Screen screen, const Board board, const Point point, co
 
   Rect position;
 
-  if(!screen_field_position(&position, screen, board, point))
+  if(!screen_field_point(&position, screen, board, point))
   {
     SDL_FreeSurface(image);
 
     return false;
   }
 
-  if(!render_surface_texture(screen.renderer, image, position))
+  if(!render_surface_texture(screen.render, image, position))
   {
     SDL_FreeSurface(image);
 
@@ -211,7 +211,7 @@ bool render_field_symbol(Screen screen, const Board board, const Point point, co
   return true;
 }
 
-bool extract_symbol_image(Surface** image, const Square square)
+bool extract_symbol_image(Surface** image, Square square)
 {
   char filename[200]; memset(filename, 0, 200);
 
@@ -232,9 +232,9 @@ bool extract_symbol_image(Surface** image, const Square square)
   return (*image != NULL);
 }
 
-char* adjacentFiles[] = {"ONE_SYMBOL.png", "TWO_SYMBOL.png", "THREE_SYMBOL.png", "FOUR_SYMBOL.png", "FIVE_SYMBOL.png", "SIX_SYMBOL.png", "SEVEN_SYMBOL.png", "EIGHT_SYMBOL.png"};
+char* adjacentFiles[] = {"one-symbol.png", "two-symbol.png", "three-symbol.png", "four-symbol.png", "five-symbol.png", "six-symbol.png", "seven-symbol.png", "eight-symbol.png"};
 
-bool extract_symbol_file(char* filename, const Square square)
+bool extract_symbol_file(char* filename, Square square)
 {
 	memset(filename, 0, 200);
 
@@ -250,12 +250,12 @@ bool extract_symbol_file(char* filename, const Square square)
   }
   else if(!square.visable && square.flagged)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, FLAGGED_SYMBOL_FILE);
+    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, FLAG_SYMBOL_FILE);
   }
   return true;
 }
 
-bool extract_square_image(Surface** image, const Square square)
+bool extract_square_image(Surface** image, Square square)
 {
   char filename[200]; memset(filename, 0, 200);
 
@@ -269,35 +269,35 @@ bool extract_square_image(Surface** image, const Square square)
   return (*image != NULL);
 }
 
-bool extract_square_file(char* filename, const Square square)
+bool extract_square_file(char* filename, Square square)
 {
 	memset(filename, 0, 200);
 
 	if(square.visable && square.mine)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, EXPLODE_SQUARE_FILE);
+    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, BLAST_SQUARE_FILE);
   }
   else if(square.visable && !square.mine)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, VISABLE_SQUARE_FILE);
+    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, SWEPT_SQUARE_FILE);
   }
   else if(!square.visable)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, DEFAULT_SQUARE_FILE);
+    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, INTACT_SQUARE_FILE);
   }
   return true;
 }
 
-bool render_surface_texture(Renderer* renderer, Surface* surface, const Rect position)
+bool render_surface_texture(Render* render, Surface* surface, Rect position)
 {
 	Texture* texture = NULL;
 
-	if(!create_surface_texture(&texture, renderer, surface))
+	if(!make_surface_texture(&texture, render, surface))
 	{
 		return false;
 	}
 
-	SDL_RenderCopy(renderer, texture, NULL, &position);
+	SDL_RenderCopy(render, texture, NULL, &position);
 
 	SDL_DestroyTexture(texture);
 

@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-Input input_screen_point(Point* point, Screen screen, Field mineField, const Board board)
+Input input_screen_point(Point* point, Screen screen, Field mineField, Board board)
 {
   Point inputPoint = {-1, -1};
 
@@ -44,7 +44,7 @@ Input input_screen_point(Point* point, Screen screen, Field mineField, const Boa
 }
 
 // Instead of Event, use only Event.motion
-Point parse_mouse_point(const Event event, Screen screen, const Board board)
+Point parse_mouse_point(Event event, Screen screen, Board board)
 {
   const int squareHeight = (screen.height / board.height);
   const int squareWidth = (screen.width / board.width);

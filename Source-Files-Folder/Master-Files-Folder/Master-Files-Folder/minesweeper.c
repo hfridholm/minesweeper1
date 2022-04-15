@@ -1,11 +1,11 @@
 
 #include "../Header-Files-Folder/master-include-file.h"
 
-#define BEGINNER_BOARD (Board) {9, 9, 10};
-#define INTERMEDIATE_BOARD (Board) {16, 16, 40};
+#define STUPID_BOARD (Board) {9, 9, 10};
+#define NORMAL_BOARD (Board) {16, 16, 40};
 #define EXPERT_BOARD (Board) {16, 30, 99};
 
-bool game_still_running(bool* result, Field field, const Board board)
+bool game_still_running(bool* result, Field field, Board board)
 {
   if(mine_field_cleared(field, board))
   {
@@ -28,7 +28,7 @@ bool game_still_running(bool* result, Field field, const Board board)
   return true;
 }
 
-bool mine_sweeper_game(bool* result, Screen screen, Field field, const Board board)
+bool mine_sweeper_game(bool* result, Screen screen, Field field, Board board)
 {
   while(game_still_running(result, field, board))
   {
@@ -75,7 +75,7 @@ int main(int argAmount, char* arguments[])
 {
   srand(time(NULL));
 
-  const Board board = INTERMEDIATE_BOARD;
+  const Board board = EXPERT_BOARD;
 
   Field field = create_field_matrix(board.height, board.width);
 
@@ -88,9 +88,9 @@ int main(int argAmount, char* arguments[])
     return false;
   }
 
-  Screen screen = {NULL, NULL, NULL, 1280, 960};
+  Screen screen = {NULL, NULL, NULL, 1280, 720};
 
-  if(!setup_display_screen(&screen, "Mine Sweeper\0"))
+  if(!setup_screen_struct(&screen, "minesweeper"))
   {
     printf("Could not setup_display_screen!\n");
 
@@ -122,7 +122,7 @@ int main(int argAmount, char* arguments[])
 
     while(event.type != SDL_QUIT)
     {
-      SDL_PollEvent(&event);
+      SDL_WaitEvent(&event);
     }
   }
   else
@@ -132,7 +132,7 @@ int main(int argAmount, char* arguments[])
 
   free_mine_field(field, board.height);
 
-  free_display_screen(screen);
+  free_screen_struct(screen);
 
   return false;
 }

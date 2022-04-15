@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/engine-include-file.h"
 
-bool mine_field_cleared(Field field, const Board board)
+bool mine_field_cleared(Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -19,7 +19,7 @@ bool mine_field_cleared(Field field, const Board board)
   return true;
 }
 
-void flag_field_mines(Field field, const Board board)
+void flag_field_mines(Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -34,7 +34,7 @@ void flag_field_mines(Field field, const Board board)
   }
 }
 
-void unlock_field_mines(Field field, const Board board)
+void unlock_field_mines(Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -49,7 +49,7 @@ void unlock_field_mines(Field field, const Board board)
   }
 }
 
-bool mine_field_exposed(Field field, const Board board)
+bool mine_field_exposed(Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -63,7 +63,7 @@ bool mine_field_exposed(Field field, const Board board)
   return false;
 }
 
-bool flag_field_square(Field field, const Board board, const Point point)
+bool flag_field_square(Field field, Board board, Point point)
 {
   if(!point_inside_board(point, board)) return false;
 
@@ -77,7 +77,7 @@ bool flag_field_square(Field field, const Board board, const Point point)
   return true;
 }
 
-bool unlock_field_square(Field field, const Board board, const Point point)
+bool unlock_field_square(Field field, Board board, Point point)
 {
   if(!point_inside_board(point, board)) return false;
 
@@ -122,7 +122,7 @@ bool unlock_field_square(Field field, const Board board, const Point point)
 	return true;
 }
 
-Field create_field_matrix(const int height, const int width)
+Field create_field_matrix(int height, int width)
 {
   Field field = malloc(sizeof(Square*) * height);
 
@@ -139,7 +139,7 @@ Field create_field_matrix(const int height, const int width)
   return field;
 }
 
-bool generate_mine_field(Field field, const Board board)
+bool generate_mine_field(Field field, Board board)
 {
   if(!activate_field_mines(field, board)) return false;
 
@@ -148,7 +148,7 @@ bool generate_mine_field(Field field, const Board board)
   return true;
 }
 
-bool activate_field_mines(Field field, const Board board)
+bool activate_field_mines(Field field, Board board)
 {
   const int total = (board.height * board.width);
 
@@ -175,7 +175,7 @@ bool activate_field_mines(Field field, const Board board)
   return true;
 }
 
-bool delete_array_point(Point* points, const int amount, const int start)
+bool delete_array_point(Point* points, int amount, int start)
 {
   if(start < 0 || start >= amount) return false;
 
@@ -187,7 +187,7 @@ bool delete_array_point(Point* points, const int amount, const int start)
   return true;
 }
 
-Point* every_field_point(const int height, const int width)
+Point* every_field_point(int height, int width)
 {
 	const int total = (height * width);
 
@@ -206,7 +206,7 @@ Point* every_field_point(const int height, const int width)
 }
 
 
-bool mark_adjacent_mines(Field field, const Board board)
+bool mark_adjacent_mines(Field field, Board board)
 {
   for(int hIndex = 0; hIndex < board.height; hIndex = hIndex + 1)
 	{
@@ -223,7 +223,7 @@ bool mark_adjacent_mines(Field field, const Board board)
   return true;
 }
 
-int adjacent_field_mines(Field field, const Board board, const Point point)
+int adjacent_field_mines(Field field, Board board, Point point)
 {
 	int adjacent = 0;
 
@@ -241,7 +241,7 @@ int adjacent_field_mines(Field field, const Board board, const Point point)
 	return adjacent;
 }
 
-bool point_inside_board(const Point point, const Board board)
+bool point_inside_board(Point point, Board board)
 {
   const bool hInside = (point.height >= 0 && point.height < board.height);
   const bool wInside = (point.width >= 0 && point.width < board.width);
@@ -249,7 +249,7 @@ bool point_inside_board(const Point point, const Board board)
 	return (hInside && wInside);
 }
 
-void free_mine_field(Field field, const int height)
+void free_mine_field(Field field, int height)
 {
   for(int hIndex = 0; hIndex < height; hIndex += 1)
   {
