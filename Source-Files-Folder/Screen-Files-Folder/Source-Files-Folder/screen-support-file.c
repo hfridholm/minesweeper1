@@ -15,6 +15,13 @@ bool setup_screen_struct(Screen* screen, char title[])
 		return false;
 	}
 
+	if(TTF_Init() == -1)
+	{
+		SDL_Quit();
+
+		return false;
+	}
+
 	if(!make_screen_window(&screen->window, screen->height, screen->width, title))
 	{
 		SDL_Quit();
@@ -269,6 +276,13 @@ bool extract_square_image(Surface** image, Square square)
   return (*image != NULL);
 }
 
+bool extract_file_font(Font** font, char filePath[], int size)
+{
+	*font = TTF_OpenFont(filePath, size);
+
+	return (*font != NULL);
+}
+
 bool extract_square_file(char* filename, Square square)
 {
 	memset(filename, 0, 200);
@@ -300,6 +314,38 @@ bool render_surface_texture(Render* render, Surface* surface, Rect position)
 	SDL_RenderCopy(render, texture, NULL, &position);
 
 	SDL_DestroyTexture(texture);
+
+	return true;
+}
+
+#define FONT_FILE "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf"
+#define FONT_SIZE 24
+
+bool render_screen_text(Screen screen, char text[], Color color, int width, int height, float size)
+{
+	Font* textFont = NULL;
+
+	if(!extract_file_font(&textFont, (char*) FONT_FILE, FONT_SIZE))
+	{
+		printf("Could not extract font!\n");
+		return false;
+	}
+
+	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(textFont, text, color);
+
+	SDL_Texture* message = SDL_CreateTextureFromSurface(screen.render, surfaceMessage);
+
+	int textHeight = surfaceMessage->h * size;
+	int textWidth = surfaceMessage->w * size;
+
+	Rect position = {width - textWidth / 2, height - textHeight / 2, textWidth, textHeight};
+
+	SDL_RenderCopy(screen.render, message, NULL, &position);
+
+	SDL_FreeSurface(surfaceMessage);
+	SDL_DestroyTexture(message);
+
+	TTF_CloseFont(textFont);
 
 	return true;
 }

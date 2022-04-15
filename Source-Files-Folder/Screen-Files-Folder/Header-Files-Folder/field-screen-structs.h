@@ -10,6 +10,8 @@ typedef SDL_Rect     Rect;
 typedef SDL_Color    Color;
 typedef SDL_Event    Event;
 
+typedef TTF_Font     Font;
+
 typedef enum Input
 {
   INPUT_NONE, INPUT_QUIT, INPUT_UNLOCK, INPUT_FLAG

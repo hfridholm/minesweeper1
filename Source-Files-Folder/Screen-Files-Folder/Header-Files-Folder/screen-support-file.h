@@ -34,4 +34,8 @@ bool extract_symbol_image(Surface**, Square);
 
 bool extract_symbol_file(char*, Square);
 
+bool render_screen_text(Screen, char[], Color, int, int, float);
+
+bool extract_file_font(Font**, char[], int);
+
 #endif

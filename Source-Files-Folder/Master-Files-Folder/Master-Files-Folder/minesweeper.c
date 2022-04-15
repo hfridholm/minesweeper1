@@ -75,7 +75,7 @@ int main(int argAmount, char* arguments[])
 {
   srand(time(NULL));
 
-  const Board board = EXPERT_BOARD;
+  const Board board = STUPID_BOARD;
 
   Field field = create_field_matrix(board.height, board.width);
 
@@ -107,14 +107,25 @@ int main(int argAmount, char* arguments[])
 
       return false;
     }
-    SDL_UpdateWindowSurface(screen.window);
 
     if(result)
     {
+      Color color = {0, 200, 0};
+
+      render_screen_text(screen, "You Won!", color, 640, 360, 9);
+
+      SDL_UpdateWindowSurface(screen.window);
+
       printf("You have won the game!\n");
     }
     else
     {
+      Color color = {200, 0, 0};
+
+      render_screen_text(screen, "You Lost!", color, 640, 360, 9);
+
+      SDL_UpdateWindowSurface(screen.window);
+
       printf("You have lost the game!\n");
     }
 
