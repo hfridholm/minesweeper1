@@ -1,6 +1,6 @@
 
-#ifndef SCREEN_HELP_FUNCTIONS_H
-#define SCREEN_HELP_FUNCTIONS_H
+#ifndef SCREEN_SUPPORT_FILE_H
+#define SCREEN_SUPPORT_FILE_H
 
 bool create_screen_window(Window**, const int, const int, const char[]);
 

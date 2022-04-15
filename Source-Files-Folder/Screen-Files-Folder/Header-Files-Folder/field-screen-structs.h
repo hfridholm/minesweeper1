@@ -1,6 +1,6 @@
 
-#ifndef SCREEN_STRUCT_DEFINES_H
-#define SCREEN_STRUCT_DEFINES_H
+#ifndef FIELD_SCREEN_STRUCTS_H
+#define FIELD_SCREEN_STRUCTS_H
 
 typedef SDL_Window Window;
 

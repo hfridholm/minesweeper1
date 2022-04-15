@@ -1,5 +1,5 @@
 
-#include "../Header-Files-Folder/interface-files-includer.h"
+#include "../Header-Files-Folder/screen-include-file.h"
 
 Input input_screen_point(Point* point, Screen screen, Field mineField, const Board board)
 {

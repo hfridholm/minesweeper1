@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "engine-struct-defines.h"
+#include "field-engine-structs.h"
 #include "mine-field-handler.h"
 
 #endif

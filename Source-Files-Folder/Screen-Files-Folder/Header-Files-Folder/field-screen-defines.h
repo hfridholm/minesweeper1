@@ -1,8 +1,8 @@
 
-#ifndef SCREEN_FILES_DEFINES_H
-#define SCREEN_FILES_DEFINES_H
+#ifndef FIELD_SCREEN_DEFINES_H
+#define FIELD_SCREEN_DEFINES_H
 
-#define SCREEN_IMAGE_FOLDER "../Source-Files-Folder/Interface-Files-Folder/Screen-Field-Images"
+#define SCREEN_IMAGE_FOLDER "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder"
 
 #define DEFAULT_SQUARE_FILE "DEFAULT_SQUARE.png"
 #define VISABLE_SQUARE_FILE "VISABLE_SQUARE.png"
