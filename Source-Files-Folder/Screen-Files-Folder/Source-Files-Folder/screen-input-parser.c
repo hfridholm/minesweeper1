@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-Input input_screen_point(Point* point, Screen screen, Field mineField, Board board)
+Input input_screen_point(Point* point, Screen* screen, Field mineField, Board board)
 {
   Point inputPoint = {-1, -1};
 
@@ -11,7 +11,11 @@ Input input_screen_point(Point* point, Screen screen, Field mineField, Board boa
 
   while(!point_inside_board(inputPoint, board))
   {
-    if(!SDL_PollEvent(&event)) continue;
+    if(!render_mine_field(*screen, mineField, board)) return false;
+
+    SDL_RenderPresent(screen->render);
+
+    if(!SDL_WaitEvent(&event)) continue;
 
     if(event.type == SDL_QUIT)
     {
@@ -23,18 +27,27 @@ Input input_screen_point(Point* point, Screen screen, Field mineField, Board boa
     {
       if(event.button.button == SDL_BUTTON_LEFT)
       {
-        inputPoint = parse_mouse_point(event, screen, board);
+        inputPoint = parse_mouse_point(event, *screen, board);
 
         inputEvent = INPUT_UNLOCK;
       }
       else if(event.button.button == SDL_BUTTON_RIGHT)
       {
-        inputPoint = parse_mouse_point(event, screen, board);
+        inputPoint = parse_mouse_point(event, *screen, board);
 
         inputEvent = INPUT_FLAG;
 
         break;
       }
+    }
+    else if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+    {
+      printf("Resizing! width: %d height: %d\n", event.window.data1, event.window.data2);
+
+      SDL_SetWindowSize(screen->window, event.window.data1, event.window.data2);
+
+      screen->width = event.window.data1;
+      screen->height = event.window.data2;
     }
   }
 

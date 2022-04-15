@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-bool setup_screen_struct(Screen* screen, char title[])
+bool setup_screen_struct(Screen* screen, char title[], uint16_t width, uint16_t height)
 {
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -22,32 +22,17 @@ bool setup_screen_struct(Screen* screen, char title[])
 		return false;
 	}
 
-	if(!make_screen_window(&screen->window, screen->height, screen->width, title))
+	screen->width = width;
+	screen->height = height;
+
+	if(!make_screen_window(&screen->window, title, screen->width, screen->height))
 	{
 		SDL_Quit();
 
 		return false;
 	}
 
-	if(!make_window_surface(&screen->surface, screen->window))
-	{
-		SDL_DestroyWindow(screen->window);
-
-		SDL_Quit();
-
-		return false;
-	}
-
-	if(!make_surface_render(&screen->render, screen->surface))
-	{
-		SDL_FreeSurface(screen->surface);
-
-		SDL_DestroyWindow(screen->window);
-
-		SDL_Quit();
-
-		return false;
-	}
+	screen->render = SDL_CreateRenderer(screen->window, -1, 0);
 
 	return true;
 }
@@ -59,23 +44,11 @@ bool make_surface_texture(Texture** texture, Render* render, Surface* surface)
 	return (texture != NULL);
 }
 
-bool make_surface_render(Render** render, Surface* surface)
+bool make_screen_window(Window** window, char title[], uint16_t width, uint16_t height)
 {
-  *render = SDL_CreateSoftwareRenderer(surface);
+  *window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-	return (*render != NULL);
-}
-
-bool make_window_surface(Surface** surface, Window* window)
-{
-  *surface = SDL_GetWindowSurface(window);
-
-	return (*surface != NULL);
-}
-
-bool make_screen_window(Window** window, int height, int width, char title[])
-{
-  *window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
 	return (*window != NULL);
 }
@@ -84,8 +57,6 @@ void free_screen_struct(Screen screen)
 {
 	SDL_DestroyRenderer(screen.render);
 
-	SDL_FreeSurface(screen.surface);
-
 	SDL_DestroyWindow(screen.window);
 
 	SDL_Quit();
@@ -93,6 +64,8 @@ void free_screen_struct(Screen screen)
 
 bool render_mine_field(Screen screen, Field field, Board board)
 {
+	SDL_RenderClear(screen.render);
+
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
     for(int wIndex = 0; wIndex < board.width; wIndex += 1)
@@ -115,8 +88,6 @@ bool render_mine_field(Screen screen, Field field, Board board)
       }
     }
   }
-
-  SDL_RenderPresent(screen.render);
 
   return true;
 }
@@ -335,8 +306,12 @@ bool render_screen_text(Screen screen, char text[], Color color, int width, int 
 
 	SDL_Texture* message = SDL_CreateTextureFromSurface(screen.render, surfaceMessage);
 
-	int textHeight = surfaceMessage->h * size;
-	int textWidth = surfaceMessage->w * size;
+	float widthRel = ((float) screen.width / (float) surfaceMessage->w);
+	float heightRel = ((float) screen.height / (float) surfaceMessage->h);
+	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
+
+	int textHeight = surfaceMessage->h * sizeFactor;
+	int textWidth = surfaceMessage->w * sizeFactor;
 
 	Rect position = {width - textWidth / 2, height - textHeight / 2, textWidth, textHeight};
 

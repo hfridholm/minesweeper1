@@ -20,10 +20,9 @@ typedef enum Input
 typedef struct Screen
 {
   Window* window;
-  Surface* surface;
   Render* render;
-  int width;
-  int height;
+  uint16_t width;
+  uint16_t height;
 } Screen;
 
 #endif

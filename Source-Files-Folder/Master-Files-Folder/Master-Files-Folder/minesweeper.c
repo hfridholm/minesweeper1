@@ -28,18 +28,18 @@ bool game_still_running(bool* result, Field field, Board board)
   return true;
 }
 
-bool mine_sweeper_game(bool* result, Screen screen, Field field, Board board)
+bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board)
 {
   while(game_still_running(result, field, board))
   {
-    if(!render_mine_field(screen, field, board))
+    if(!render_mine_field(*screen, field, board))
     {
       printf("Could not render_mine_field!\n");
 
       return false;
     }
-    SDL_UpdateWindowSurface(screen.window);
 
+    SDL_RenderPresent(screen->render);
 
     Point point = {-1, -1};
 
@@ -75,7 +75,7 @@ int main(int argAmount, char* arguments[])
 {
   srand(time(NULL));
 
-  const Board board = STUPID_BOARD;
+  const Board board = NORMAL_BOARD;
 
   Field field = create_field_matrix(board.height, board.width);
 
@@ -88,9 +88,9 @@ int main(int argAmount, char* arguments[])
     return false;
   }
 
-  Screen screen = {NULL, NULL, NULL, 1280, 720};
+  Screen screen;
 
-  if(!setup_screen_struct(&screen, "minesweeper"))
+  if(!setup_screen_struct(&screen, "minesweeper", 1280, 720))
   {
     printf("Could not setup_display_screen!\n");
 
@@ -99,7 +99,7 @@ int main(int argAmount, char* arguments[])
 
   bool result = false;
 
-  if(mine_sweeper_game(&result, screen, field, board))
+  if(mine_sweeper_game(&result, &screen, field, board))
   {
     if(!render_mine_field(screen, field, board))
     {
@@ -112,9 +112,10 @@ int main(int argAmount, char* arguments[])
     {
       Color color = {0, 200, 0};
 
-      render_screen_text(screen, "You Won!", color, 640, 360, 9);
-
-      SDL_UpdateWindowSurface(screen.window);
+      if(!render_screen_text(screen, "You Won!", color, screen.width / 2, screen.height / 2, 5))
+      {
+        printf("Could not render text result!\n");
+      }
 
       printf("You have won the game!\n");
     }
@@ -122,12 +123,15 @@ int main(int argAmount, char* arguments[])
     {
       Color color = {200, 0, 0};
 
-      render_screen_text(screen, "You Lost!", color, 640, 360, 9);
-
-      SDL_UpdateWindowSurface(screen.window);
+      if(!render_screen_text(screen, "You Lost!", color, screen.width / 2, screen.height / 2, 5))
+      {
+        printf("Could not render text result!\n");
+      }
 
       printf("You have lost the game!\n");
     }
+
+    SDL_RenderPresent(screen.render);
 
     Event event;
 
@@ -141,8 +145,10 @@ int main(int argAmount, char* arguments[])
     printf("The game was quitted!\n");
   }
 
+  printf("free_mine_field(field, board.height);\n");
   free_mine_field(field, board.height);
 
+  printf("free_screen_struct(screen);\n");
   free_screen_struct(screen);
 
   return false;
