@@ -1,0 +1,14 @@
+
+#ifndef SCREEN_FILES_DEFINES_H
+#define SCREEN_FILES_DEFINES_H
+
+#define SCREEN_IMAGE_FOLDER "../Source-Files-Folder/Interface-Files-Folder/Screen-Field-Images"
+
+#define DEFAULT_SQUARE_FILE "DEFAULT_SQUARE.png"
+#define VISABLE_SQUARE_FILE "VISABLE_SQUARE.png"
+#define EXPLODE_SQUARE_FILE "EXPLODE_SQUARE.png"
+
+#define MINE_SYMBOL_FILE "MINE_SYMBOL.png"
+#define FLAGGED_SYMBOL_FILE "FLAGGED_SYMBOL.png"
+
+#endif
