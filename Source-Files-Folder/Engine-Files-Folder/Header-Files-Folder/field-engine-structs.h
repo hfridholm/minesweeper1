@@ -4,28 +4,23 @@
 
 typedef struct Square
 {
-  bool mine;
-  bool visable;
-  bool flagged;
+  bool mine, visable, flagged;
   int adjacent;
 } Square;
 
 typedef struct Point
 {
-  int height;
-  int width;
+  int height, width;
 } Point;
 
 typedef struct Board
 {
-  int height;
-  int width;
-  int mines;
+  int height, width, mines;
 } Board;
 
-#define STUPID_BOARD (Board) {9, 9, 10};
-#define NORMAL_BOARD (Board) {16, 16, 40};
-#define EXPERT_BOARD (Board) {16, 30, 99};
+extern const Board STUPID_BOARD;
+extern const Board NORMAL_BOARD;
+extern const Board EXPERT_BOARD;
 
 typedef Square** Field;
 

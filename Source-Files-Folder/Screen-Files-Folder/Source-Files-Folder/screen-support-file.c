@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-bool setup_screen_struct(Screen* screen, char title[], uint16_t width, uint16_t height)
+bool setup_screen_struct(Screen* screen, char title[], int width, int height)
 {
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -18,11 +18,19 @@ bool setup_screen_struct(Screen* screen, char title[], uint16_t width, uint16_t 
 	if(TTF_Init() == -1)
 	{
 		SDL_Quit();
+		IMG_Quit();
 
 		return false;
 	}
 
-	Mix_Init(0);
+	if(Mix_Init(0) != 0)
+	{
+		SDL_Quit();
+		IMG_Quit();
+		TTF_Quit();
+
+		return false;
+	}
 
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 
@@ -32,6 +40,9 @@ bool setup_screen_struct(Screen* screen, char title[], uint16_t width, uint16_t 
 	if(!make_screen_window(&screen->window, title, screen->width, screen->height))
 	{
 		SDL_Quit();
+		IMG_Quit();
+		TTF_Quit();
+		Mix_Quit();
 
 		return false;
 	}
@@ -48,7 +59,7 @@ bool make_surface_texture(Texture** texture, Render* render, Surface* surface)
 	return (texture != NULL);
 }
 
-bool make_screen_window(Window** window, char title[], uint16_t width, uint16_t height)
+bool make_screen_window(Window** window, char title[], int width, int height)
 {
   *window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
@@ -64,6 +75,9 @@ void free_screen_struct(Screen screen)
 	SDL_DestroyWindow(screen.window);
 
 	SDL_Quit();
+	IMG_Quit();
+  TTF_Quit();
+  Mix_Quit();
 }
 
 bool render_mine_field(Screen screen, Field field, Board board, Images images)
@@ -74,8 +88,8 @@ bool render_mine_field(Screen screen, Field field, Board board, Images images)
   {
     for(int wIndex = 0; wIndex < board.width; wIndex += 1)
     {
-      const Square square = field[hIndex][wIndex];
-      const Point point = {hIndex, wIndex};
+      Square square = field[hIndex][wIndex];
+      Point point = {hIndex, wIndex};
 
       if(!render_field_square(screen, board, point, square, images))
       {
@@ -85,7 +99,6 @@ bool render_mine_field(Screen screen, Field field, Board board, Images images)
       }
     }
   }
-
   return true;
 }
 
@@ -127,8 +140,6 @@ bool render_field_square(Screen screen, Board board, Point point, Square square,
 			return false;
 		}
 	}
-
-
 	return true;
 }
 
@@ -136,22 +147,22 @@ bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
 {
   if(!point_inside_board(point, board)) return false;
 
-	const int squareHeight = (screen.height / board.height);
-  const int squareWidth = (screen.width / board.width);
+	int squareHeight = (screen.height / board.height);
+	int squareWidth = (screen.width / board.width);
 
-	const int squareLength = (squareHeight > squareWidth) ? squareWidth : squareHeight;
+	int squareLength = (squareHeight > squareWidth) ? squareWidth : squareHeight;
 
-	const int fieldHeight = (squareLength * board.height);
-	const int fieldWidth = (squareLength * board.width);
+	int fieldHeight = (squareLength * board.height);
+	int fieldWidth = (squareLength * board.width);
 
-	const int heightBlank = (screen.height - fieldHeight) / 2;
-	const int widthBlank = (screen.width - fieldWidth) / 2;
+	int heightBlank = (screen.height - fieldHeight) / 2;
+	int widthBlank = (screen.width - fieldWidth) / 2;
 
-	const int relativeHeight = (point.height * squareLength);
-	const int relativeWidth = (point.width * squareLength);
+	int relativeHeight = (point.height * squareLength);
+	int relativeWidth = (point.width * squareLength);
 
-	const int height = (heightBlank + relativeHeight);
-  const int width = (widthBlank + relativeWidth);
+	int height = (heightBlank + relativeHeight);
+  int width = (widthBlank + relativeWidth);
 
   *position = (Rect) {width, height, squareLength, squareLength};
 
@@ -172,7 +183,6 @@ bool extract_symbol_image(Image** image, Square square, Images images)
   {
     *image = images.flagSymbol;
   }
-
 	return true;
 }
 
@@ -242,27 +252,27 @@ bool render_board_options(Screen screen)
 {
 	SDL_RenderClear(screen.render);
 
-	uint16_t relativeBoardWidth = 100;
-	uint16_t relativeBoardHeight = 200;
+	int relativeBoardWidth = 100;
+	int relativeBoardHeight = 200;
 
 	float boardMargin = 0.1;
 
-	uint16_t relativeTotalWidth = ((relativeBoardWidth * 3) + (boardMargin * relativeBoardWidth * 2));
-	uint16_t relativeTotalHeight = relativeBoardHeight;
+	int relativeTotalWidth = ((relativeBoardWidth * 3) + (boardMargin * relativeBoardWidth * 2));
+	int relativeTotalHeight = relativeBoardHeight;
 
 	float widthRel = ((float) screen.width / (float) relativeTotalWidth);
 	float heightRel = ((float) screen.height / (float) relativeTotalHeight);
 
 	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
 
-	uint16_t totalHeight = relativeTotalHeight * sizeFactor;
-	uint16_t totalWidth = relativeTotalWidth * sizeFactor;
+	int totalHeight = relativeTotalHeight * sizeFactor;
+	int totalWidth = relativeTotalWidth * sizeFactor;
 
 	uint16_t height = (screen.height - totalHeight) / 2;
 	uint16_t width = (screen.width - totalWidth) / 2;
 
-	uint16_t boardHeight = (relativeBoardHeight * sizeFactor);
-	uint16_t boardWidth = (relativeBoardWidth * sizeFactor);
+	int boardHeight = (relativeBoardHeight * sizeFactor);
+	int boardWidth = (relativeBoardWidth * sizeFactor);
 
 	Rect stupidPosition = {width + 0, height, boardWidth, boardHeight};
 
@@ -270,13 +280,10 @@ bool render_board_options(Screen screen)
 
 	Rect expertPosition = {width + (2 * boardWidth) + (2 * boardMargin * boardWidth), height, boardWidth, boardHeight};
 
-	//printf("Render stupid\n");
 	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", stupidPosition);
 
-	//printf("Render normal\n");
 	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", normalPosition);
 
-	//printf("Render expert\n");
 	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", expertPosition);
 
 	return true;
@@ -330,7 +337,7 @@ void free_sounds_struct(Sounds sounds)
 
 void free_images_struct(Images images)
 {
-	for(uint8_t index = 0; index < 8; index += 1)
+	for(int index = 0; index < 8; index += 1)
 	{
 		SDL_FreeSurface(images.nextSymbols[index]);
 	}

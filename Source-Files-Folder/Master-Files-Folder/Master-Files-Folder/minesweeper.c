@@ -110,13 +110,9 @@ int main(int argAmount, char* arguments[])
   }
 
   extract_file_image(&images.mineSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/mine-symbol.png");
-
   extract_file_image(&images.flagSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/flag-symbol.png");
-
   extract_file_image(&images.intactSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/intact-square.png");
-
   extract_file_image(&images.blastSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/blast-square.png");
-
   extract_file_image(&images.sweptSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/swept-square.png");
 
 
@@ -143,7 +139,7 @@ int main(int argAmount, char* arguments[])
   {
     printf("Could not generate field!\n");
 
-    free_mine_field(field, board.height);
+    free_mine_field(field, board);
 
     free_sounds_struct(sounds);
 
@@ -163,7 +159,7 @@ int main(int argAmount, char* arguments[])
     {
       printf("Could not render_mine_field!\n");
 
-      free_mine_field(field, board.height);
+      free_mine_field(field, board);
 
       free_sounds_struct(sounds);
 
@@ -223,8 +219,8 @@ int main(int argAmount, char* arguments[])
   printf("free_sounds_struct\n");
   free_sounds_struct(sounds);
 
-  printf("free_mine_field(field, board.height);\n");
-  free_mine_field(field, board.height);
+  printf("free_mine_field(field, board);\n");
+  free_mine_field(field, board);
 
   printf("free_screen_struct(screen);\n");
   free_screen_struct(screen);

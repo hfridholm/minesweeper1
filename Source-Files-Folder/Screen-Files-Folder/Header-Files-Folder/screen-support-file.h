@@ -2,11 +2,11 @@
 #ifndef SCREEN_SUPPORT_FILE_H
 #define SCREEN_SUPPORT_FILE_H
 
-bool make_screen_window(Window**, char[], uint16_t, uint16_t);
+bool make_screen_window(Window**, char[], int, int);
 
 bool make_surface_texture(Texture**, Render*, Surface*);
 
-bool setup_screen_struct(Screen*, char[], uint16_t, uint16_t);
+bool setup_screen_struct(Screen*, char[], int, int);
 
 void free_screen_struct(Screen);
 
