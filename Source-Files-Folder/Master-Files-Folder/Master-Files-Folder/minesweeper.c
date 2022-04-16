@@ -24,7 +24,7 @@ bool game_still_running(bool* result, Field field, Board board)
   return true;
 }
 
-bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board)
+bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board, Sounds sounds)
 {
   while(game_still_running(result, field, board))
   {
@@ -49,6 +49,11 @@ bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board)
     }
     else if(inputEvent == INPUT_UNLOCK)
     {
+
+
+      Mix_PlayChannel(-1, sounds.unlockEffect, 0);
+
+
       if(!unlock_field_square(field, board, point))
       {
         printf("Could not unlock_field_square!\n");
@@ -56,6 +61,9 @@ bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board)
     }
     else if(inputEvent == INPUT_FLAG)
     {
+
+      Mix_PlayChannel(-1, sounds.flagEffect, 0);
+
       if(!flag_field_square(field, board, point))
       {
         printf("Could not flag_field_square!\n");
@@ -80,6 +88,15 @@ int main(int argAmount, char* arguments[])
     return false;
   }
 
+  Sounds sounds;
+
+  sounds.unlockEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-click-sound.wav");
+  sounds.flagEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-flag-sound.wav");
+  sounds.winEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/win-result-sound.wav");
+  sounds.loseEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/lose-result-sound.wav");
+
+
+
 
   Board board;
 
@@ -102,23 +119,36 @@ int main(int argAmount, char* arguments[])
 
     free_mine_field(field, board.height);
 
+    free_sounds_struct(sounds);
+
+    free_screen_struct(screen);
+
     return false;
   }
 
 
   bool result = false;
 
-  if(mine_sweeper_game(&result, &screen, field, board))
+  if(mine_sweeper_game(&result, &screen, field, board, sounds))
   {
     if(!render_mine_field(screen, field, board))
     {
       printf("Could not render_mine_field!\n");
+
+      free_mine_field(field, board.height);
+
+      free_sounds_struct(sounds);
+
+      free_screen_struct(screen);
 
       return false;
     }
 
     if(result)
     {
+      Mix_PlayChannel(-1, sounds.winEffect, 0);
+
+
       Color color = {0, 200, 0};
 
       if(!render_screen_text(screen, "You Won!", color, screen.width / 2, screen.height / 2, 5))
@@ -130,6 +160,9 @@ int main(int argAmount, char* arguments[])
     }
     else
     {
+      Mix_PlayChannel(-1, sounds.loseEffect, 0);
+
+
       Color color = {200, 0, 0};
 
       if(!render_screen_text(screen, "You Lost!", color, screen.width / 2, screen.height / 2, 5))
@@ -153,6 +186,9 @@ int main(int argAmount, char* arguments[])
   {
     printf("The game was quitted!\n");
   }
+
+  printf("free_sounds_struct\n");
+  free_sounds_struct(sounds);
 
   printf("free_mine_field(field, board.height);\n");
   free_mine_field(field, board.height);

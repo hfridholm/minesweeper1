@@ -12,6 +12,9 @@ typedef SDL_Event    Event;
 
 typedef TTF_Font     Font;
 
+typedef Mix_Chunk    Effect;
+typedef Mix_Music    Music;
+
 typedef enum Input
 {
   INPUT_NONE, INPUT_QUIT, INPUT_UNLOCK, INPUT_FLAG
@@ -24,5 +27,13 @@ typedef struct Screen
   uint16_t width;
   uint16_t height;
 } Screen;
+
+typedef struct Sounds
+{
+  Effect* unlockEffect;
+  Effect* flagEffect;
+  Effect* winEffect;
+  Effect* loseEffect;
+} Sounds;
 
 #endif

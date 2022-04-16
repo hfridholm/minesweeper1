@@ -22,6 +22,10 @@ bool setup_screen_struct(Screen* screen, char title[], uint16_t width, uint16_t 
 		return false;
 	}
 
+	Mix_Init(0);
+
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+
 	screen->width = width;
 	screen->height = height;
 
@@ -398,4 +402,15 @@ bool render_screen_image(Screen screen, Surface* image, Rect position)
 	SDL_DestroyTexture(texture);
 
 	return true;
+}
+
+void free_sounds_struct(Sounds sounds)
+{
+	Mix_FreeChunk(sounds.unlockEffect);
+
+	Mix_FreeChunk(sounds.flagEffect);
+
+	Mix_FreeChunk(sounds.winEffect);
+
+	Mix_FreeChunk(sounds.loseEffect);
 }

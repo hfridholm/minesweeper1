@@ -42,4 +42,6 @@ bool render_file_image(Screen, char[], Rect);
 
 bool render_screen_image(Screen, Surface*, Rect);
 
+void free_sounds_struct(Sounds);
+
 #endif
