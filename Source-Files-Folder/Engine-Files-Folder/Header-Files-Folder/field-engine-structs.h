@@ -18,6 +18,11 @@ typedef struct Board
   int height, width, mines;
 } Board;
 
+typedef enum Result
+{
+  RESULT_NONE, RESULT_WIN, RESULT_LOSE
+} Result;
+
 extern const Board STUPID_BOARD;
 extern const Board NORMAL_BOARD;
 extern const Board EXPERT_BOARD;

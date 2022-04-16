@@ -23,8 +23,6 @@ bool input_screen_board(Board* board, Screen* screen)
 
     else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
     {
-      printf("click\n");
-
       if(!parse_board_input(&inputBoard, event, *screen))
       {
         continue;

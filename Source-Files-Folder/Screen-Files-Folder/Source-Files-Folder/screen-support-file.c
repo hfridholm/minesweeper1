@@ -352,3 +352,183 @@ void free_images_struct(Images images)
 
 	SDL_FreeSurface(images.sweptSquare);
 }
+
+void free_screen_structs(Screen screen, Images images, Sounds sounds)
+{
+	free_screen_struct(screen);
+
+	free_images_struct(images);
+
+	free_sounds_struct(sounds);
+}
+
+bool render_result_screen(Screen screen, Images images, Sounds sounds, Field field, Board board, Result result)
+{
+	if(!render_mine_field(screen, field, board, images))
+	{
+		printf("Could not render_mine_field!\n");
+
+		return false;
+	}
+
+	if(!render_result_message(screen, sounds, result))
+	{
+		printf("Could not render_result_message\n");
+		return false;
+	}
+
+	SDL_RenderPresent(screen.render);
+
+	return true;
+}
+
+bool render_result_message(Screen screen, Sounds sounds, Result result)
+{
+	if(result == RESULT_WIN)
+	{
+		Color color = {0, 200, 0};
+
+		if(!render_screen_text(screen, "You Won!", color, screen.width / 2, screen.height / 2, 5))
+		{
+			printf("Could not render text result!\n");
+		}
+
+		Mix_PlayChannel(-1, sounds.winEffect, 0);
+	}
+	else if(result == RESULT_LOSE)
+	{
+		Color color = {128, 8, 0};
+
+		if(!render_screen_text(screen, "You Lost!", color, screen.width / 2, screen.height / 2, 5))
+		{
+			printf("Could not render text result!\n");
+		}
+
+		Mix_PlayChannel(-1, sounds.loseEffect, 0);
+	}
+	return true;
+}
+
+bool game_result_handler(Screen screen, Images images, Sounds sounds, Field field, Board board, Result result)
+{
+	render_result_screen(screen, images, sounds, field, board, result);
+
+	Event event;
+
+	while(event.type != SDL_QUIT)
+	{
+		SDL_WaitEvent(&event);
+	}
+
+	return true;
+}
+
+bool game_action_handler(Field field, Board board, Screen* screen, Images images, Sounds sounds)
+{
+	if(!render_mine_field(*screen, field, board, images))
+	{
+		printf("Could not render_mine_field!\n");
+
+		return false;
+	}
+
+	SDL_RenderPresent(screen->render);
+
+	Point point = {-1, -1};
+
+	Input inputEvent = input_screen_point(&point, screen, field, board, images);
+
+	if(!point_input_handler(field, board, inputEvent, point, sounds))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool point_input_handler(Field field, Board board, Input inputEvent, Point point, Sounds sounds)
+{
+	if(inputEvent == INPUT_QUIT)
+	{
+		return false;
+	}
+	else if(inputEvent == INPUT_UNLOCK)
+	{
+		if(unlock_field_square(field, board, point))
+		{
+			Mix_PlayChannel(-1, sounds.unlockEffect, 0);
+		}
+		else printf("Could not unlock_field_square!\n");
+	}
+	else if(inputEvent == INPUT_FLAG)
+	{
+		if(flag_field_square(field, board, point))
+		{
+			Mix_PlayChannel(-1, sounds.flagEffect, 0);
+		}
+		else printf("Could not flag_field_square!\n");
+	}
+	return true;
+}
+
+bool setup_sounds_struct(Sounds* sounds)
+{
+	sounds->unlockEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-click-sound.wav");
+  sounds->flagEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-flag-sound.wav");
+  sounds->winEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/win-result-sound.wav");
+  sounds->loseEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/lose-result-sound.wav");
+
+	return true;
+}
+
+bool setup_images_struct(Images* images)
+{
+	char* nextStrings[] = {"one", "two", "three", "four", "five", "six", "seven", "eight"};
+
+  for(int index = 0; index < 8; index += 1)
+  {
+    char filePath[200];
+
+    sprintf(filePath, "%s/%s-symbol.png", SCREEN_IMAGE_FOLDER, nextStrings[index]);
+
+    extract_file_image(&images->nextSymbols[index], filePath);
+  }
+
+  extract_file_image(&images->mineSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/mine-symbol.png");
+  extract_file_image(&images->flagSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/flag-symbol.png");
+  extract_file_image(&images->intactSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/intact-square.png");
+  extract_file_image(&images->blastSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/blast-square.png");
+  extract_file_image(&images->sweptSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/swept-square.png");
+
+	return true;
+}
+
+bool setup_screen_structs(Screen* screen, char title[], int width, int height, Images* images, Sounds* sounds)
+{
+	if(!setup_screen_struct(screen, title, width, height))
+  {
+    printf("Could not setup_display_screen!\n");
+
+    return false;
+  }
+	if(!setup_sounds_struct(sounds))
+  {
+    printf("Could not setup_sounds_struct\n");
+
+		free_screen_struct(*screen);
+
+		return false;
+  }
+
+  if(!setup_images_struct(images))
+  {
+		printf("Could not setup_images_struct\n");
+
+		free_screen_struct(*screen);
+
+		free_sounds_struct(*sounds);
+
+		return false;
+  }
+	return true;
+}

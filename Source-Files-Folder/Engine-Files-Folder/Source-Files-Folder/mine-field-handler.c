@@ -78,7 +78,8 @@ bool unlock_field_square(Field field, Board board, Point point)
 
   Square square = field[point.height][point.width];
 
-  if(square.flagged) return false;
+  if(square.flagged || square.visable) return false;
+
 
 	field[point.height][point.width].visable = true;
 

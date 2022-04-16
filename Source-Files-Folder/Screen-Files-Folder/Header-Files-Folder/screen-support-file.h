@@ -36,4 +36,18 @@ void free_sounds_struct(Sounds);
 
 void free_images_struct(Images);
 
+void free_screen_structs(Screen, Images, Sounds);
+
+bool render_result_screen(Screen, Images, Sounds, Field, Board, Result);
+
+bool game_result_handler(Screen, Images, Sounds, Field, Board, Result);
+
+bool game_action_handler(Field, Board, Screen*, Images, Sounds);
+
+bool point_input_handler(Field, Board, Input, Point, Sounds);
+
+bool render_result_message(Screen, Sounds, Result);
+
+bool setup_screen_structs(Screen*, char[], int, int, Images*, Sounds*);
+
 #endif
