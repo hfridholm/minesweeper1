@@ -10,25 +10,15 @@ bool setup_screen_struct(Screen*, char[], uint16_t, uint16_t);
 
 void free_screen_struct(Screen);
 
-bool color_point_square(Screen, Board, Point, Color);
+bool render_field_square(Screen, Board, Point, Square, Images);
 
-bool render_field_square(Screen, Board, Point, Square);
+bool render_mine_field(Screen, Field, Board, Images);
 
-bool render_field_symbol(Screen, Board, Point, Square);
-
-bool render_mine_field(Screen, Field, Board);
-
-bool render_surface_texture(Render*, Surface*, Rect);
-
-bool extract_square_file(char*, Square);
-
-bool extract_square_image(Surface**, Square);
+bool extract_square_image(Image**, Square, Images);
 
 bool screen_field_point(Rect*, Screen, Board, Point);
 
-bool extract_symbol_image(Surface**, Square);
-
-bool extract_symbol_file(char*, Square);
+bool extract_symbol_image(Image**, Square, Images);
 
 bool render_screen_text(Screen, char[], Color, int, int, float);
 
@@ -43,5 +33,7 @@ bool render_file_image(Screen, char[], Rect);
 bool render_screen_image(Screen, Surface*, Rect);
 
 void free_sounds_struct(Sounds);
+
+void free_images_struct(Images);
 
 #endif

@@ -9,6 +9,7 @@ typedef SDL_Texture  Texture;
 typedef SDL_Rect     Rect;
 typedef SDL_Color    Color;
 typedef SDL_Event    Event;
+typedef SDL_Surface  Image;
 
 typedef TTF_Font     Font;
 
@@ -27,6 +28,16 @@ typedef struct Screen
   uint16_t width;
   uint16_t height;
 } Screen;
+
+typedef struct Images
+{
+  Image* nextSymbols[8];
+  Image* mineSymbol;
+  Image* flagSymbol;
+  Image* blastSquare;
+  Image* sweptSquare;
+  Image* intactSquare;
+} Images;
 
 typedef struct Sounds
 {

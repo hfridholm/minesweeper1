@@ -45,7 +45,7 @@ bool input_screen_board(Board* board, Screen* screen)
   return true;
 }
 
-Input input_screen_point(Point* point, Screen* screen, Field mineField, Board board)
+Input input_screen_point(Point* point, Screen* screen, Field mineField, Board board, Images images)
 {
   Point inputPoint = {-1, -1};
 
@@ -55,7 +55,7 @@ Input input_screen_point(Point* point, Screen* screen, Field mineField, Board bo
 
   while(!point_inside_board(inputPoint, board))
   {
-    if(!render_mine_field(*screen, mineField, board)) return false;
+    if(!render_mine_field(*screen, mineField, board, images)) return false;
 
     SDL_RenderPresent(screen->render);
 

@@ -24,11 +24,11 @@ bool game_still_running(bool* result, Field field, Board board)
   return true;
 }
 
-bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board, Sounds sounds)
+bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board, Sounds sounds, Images images)
 {
   while(game_still_running(result, field, board))
   {
-    if(!render_mine_field(*screen, field, board))
+    if(!render_mine_field(*screen, field, board, images))
     {
       printf("Could not render_mine_field!\n");
 
@@ -39,7 +39,7 @@ bool mine_sweeper_game(bool* result, Screen* screen, Field field, Board board, S
 
     Point point = {-1, -1};
 
-    Input inputEvent = input_screen_point(&point, screen, field, board);
+    Input inputEvent = input_screen_point(&point, screen, field, board, images);
 
     if(inputEvent == INPUT_QUIT)
     {
@@ -96,6 +96,28 @@ int main(int argAmount, char* arguments[])
   sounds.loseEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/lose-result-sound.wav");
 
 
+  Images images;
+
+  char* nextStrings[] = {"one", "two", "three", "four", "five", "six", "seven", "eight"};
+
+  for(uint8_t index = 0; index < 8; index += 1)
+  {
+    char filePath[200];
+
+    sprintf(filePath, "%s/%s-symbol.png", SCREEN_IMAGE_FOLDER, nextStrings[index]);
+
+    extract_file_image(&images.nextSymbols[index], filePath);
+  }
+
+  extract_file_image(&images.mineSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/mine-symbol.png");
+
+  extract_file_image(&images.flagSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/flag-symbol.png");
+
+  extract_file_image(&images.intactSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/intact-square.png");
+
+  extract_file_image(&images.blastSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/blast-square.png");
+
+  extract_file_image(&images.sweptSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/swept-square.png");
 
 
   Board board;
@@ -106,6 +128,10 @@ int main(int argAmount, char* arguments[])
     printf("could not input board!\n");
 
     free_screen_struct(screen);
+
+    free_sounds_struct(sounds);
+
+    free_images_struct(images);
 
     return false;
   }
@@ -121,6 +147,8 @@ int main(int argAmount, char* arguments[])
 
     free_sounds_struct(sounds);
 
+    free_images_struct(images);
+
     free_screen_struct(screen);
 
     return false;
@@ -129,9 +157,9 @@ int main(int argAmount, char* arguments[])
 
   bool result = false;
 
-  if(mine_sweeper_game(&result, &screen, field, board, sounds))
+  if(mine_sweeper_game(&result, &screen, field, board, sounds, images))
   {
-    if(!render_mine_field(screen, field, board))
+    if(!render_mine_field(screen, field, board, images))
     {
       printf("Could not render_mine_field!\n");
 
@@ -140,6 +168,8 @@ int main(int argAmount, char* arguments[])
       free_sounds_struct(sounds);
 
       free_screen_struct(screen);
+
+      free_images_struct(images);
 
       return false;
     }
@@ -163,7 +193,7 @@ int main(int argAmount, char* arguments[])
       Mix_PlayChannel(-1, sounds.loseEffect, 0);
 
 
-      Color color = {200, 0, 0};
+      Color color = {128, 8, 0};
 
       if(!render_screen_text(screen, "You Lost!", color, screen.width / 2, screen.height / 2, 5))
       {
@@ -186,6 +216,9 @@ int main(int argAmount, char* arguments[])
   {
     printf("The game was quitted!\n");
   }
+
+  printf("free_images_struct(images);\n");
+  free_images_struct(images);
 
   printf("free_sounds_struct\n");
   free_sounds_struct(sounds);

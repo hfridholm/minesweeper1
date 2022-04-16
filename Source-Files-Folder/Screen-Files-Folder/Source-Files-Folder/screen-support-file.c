@@ -66,7 +66,7 @@ void free_screen_struct(Screen screen)
 	SDL_Quit();
 }
 
-bool render_mine_field(Screen screen, Field field, Board board)
+bool render_mine_field(Screen screen, Field field, Board board, Images images)
 {
 	SDL_RenderClear(screen.render);
 
@@ -77,16 +77,9 @@ bool render_mine_field(Screen screen, Field field, Board board)
       const Square square = field[hIndex][wIndex];
       const Point point = {hIndex, wIndex};
 
-      if(!render_field_square(screen, board, point, square))
+      if(!render_field_square(screen, board, point, square, images))
       {
         printf("Could not render_field_square!\n");
-
-        return false;
-      }
-
-      if(!render_field_symbol(screen, board, point, square))
-      {
-        printf("Could not render_field_symbol!\n");
 
         return false;
       }
@@ -96,36 +89,47 @@ bool render_mine_field(Screen screen, Field field, Board board)
   return true;
 }
 
-bool render_field_square(Screen screen, Board board, Point point, Square square)
+bool render_field_square(Screen screen, Board board, Point point, Square square, Images images)
 {
-  Surface* image = NULL;
+	Image* squareImage = NULL;
+	Image* symbolImage = NULL;
 
-  if(!extract_square_image(&image, square))
+	if(!extract_square_image(&squareImage, square, images))
   {
     printf("Could not extract_square_image!\n");
 
     return false;
   }
 
+	if(!extract_symbol_image(&symbolImage, square, images))
+	{
+		printf("Could not extract_symbol_image\n");
+
+		return false;
+	}
+
   Rect position;
 
   if(!screen_field_point(&position, screen, board, point))
   {
-    SDL_FreeSurface(image);
-
     return false;
   }
 
-  if(!render_surface_texture(screen.render, image, position))
+  if(!render_screen_image(screen, squareImage, position))
   {
-    SDL_FreeSurface(image);
-
     return false;
   }
 
-  SDL_FreeSurface(image);
+	if(symbolImage != NULL)
+	{
+		if(!render_screen_image(screen, symbolImage, position))
+		{
+			return false;
+		}
+	}
 
-  return true;
+
+	return true;
 }
 
 bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
@@ -154,97 +158,41 @@ bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
   return true;
 }
 
-bool render_field_symbol(Screen screen, Board board, Point point, Square square)
+bool extract_symbol_image(Image** image, Square square, Images images)
 {
-  Surface* image = NULL;
-
-  if(!extract_symbol_image(&image, square))
-  {
-    printf("Could not extract_symbol_image!\n");
-
-    return false;
-  }
-
-  // If the image is NULL, but the function returned true anyways.
-  if(image == NULL)
-  {
-    // This means that the function returned an empty image (blank)
-    return true;
-  }
-
-  Rect position;
-
-  if(!screen_field_point(&position, screen, board, point))
-  {
-    SDL_FreeSurface(image);
-
-    return false;
-  }
-
-  if(!render_surface_texture(screen.render, image, position))
-  {
-    SDL_FreeSurface(image);
-
-    return false;
-  }
-
-  SDL_FreeSurface(image);
-
-  return true;
-}
-
-bool extract_symbol_image(Surface** image, Square square)
-{
-  char filename[200]; memset(filename, 0, 200);
-
-  if(!extract_symbol_file(filename, square))
-  {
-    return false;
-  }
-
-  // If the function returned true but no filename
-  if(strlen(filename) == 0)
-  {
-    // Returning true without extracting image (no image)
-    return true;
-  }
-
-  return extract_file_image(image, filename);
-}
-
-char* adjacentFiles[] = {"one-symbol.png", "two-symbol.png", "three-symbol.png", "four-symbol.png", "five-symbol.png", "six-symbol.png", "seven-symbol.png", "eight-symbol.png"};
-
-bool extract_symbol_file(char* filename, Square square)
-{
-	memset(filename, 0, 200);
-
 	if(square.visable && square.mine)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, MINE_SYMBOL_FILE);
+    *image = images.mineSymbol;
   }
 	else if(square.visable && square.adjacent != 0)
   {
-    char* adjacentFile = adjacentFiles[square.adjacent - 1];
-
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, adjacentFile);
+    *image = images.nextSymbols[square.adjacent - 1];
   }
   else if(!square.visable && square.flagged)
   {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, FLAG_SYMBOL_FILE);
+    *image = images.flagSymbol;
   }
-  return true;
+
+	return true;
 }
 
-bool extract_square_image(Surface** image, Square square)
+bool extract_square_image(Image** image, Square square, Images images)
 {
-  char filename[200]; memset(filename, 0, 200);
-
-  if(!extract_square_file(filename, square))
+	if(square.visable && square.mine)
   {
-    return false;
+    *image = images.blastSquare;
   }
+  else if(square.visable && !square.mine)
+  {
+    *image = images.sweptSquare;
+  }
+  else if(!square.visable)
+  {
+    *image = images.intactSquare;
+  }
+	else return false;
 
-  return extract_file_image(image, filename);
+	return true;
 }
 
 bool extract_file_font(Font** font, char filePath[], int size)
@@ -252,41 +200,6 @@ bool extract_file_font(Font** font, char filePath[], int size)
 	*font = TTF_OpenFont(filePath, size);
 
 	return (*font != NULL);
-}
-
-bool extract_square_file(char* filename, Square square)
-{
-	memset(filename, 0, 200);
-
-	if(square.visable && square.mine)
-  {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, BLAST_SQUARE_FILE);
-  }
-  else if(square.visable && !square.mine)
-  {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, SWEPT_SQUARE_FILE);
-  }
-  else if(!square.visable)
-  {
-    sprintf(filename, "%s/%s", SCREEN_IMAGE_FOLDER, INTACT_SQUARE_FILE);
-  }
-  return true;
-}
-
-bool render_surface_texture(Render* render, Surface* surface, Rect position)
-{
-	Texture* texture = NULL;
-
-	if(!make_surface_texture(&texture, render, surface))
-	{
-		return false;
-	}
-
-	SDL_RenderCopy(render, texture, NULL, &position);
-
-	SDL_DestroyTexture(texture);
-
-	return true;
 }
 
 #define FONT_FILE "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf"
@@ -413,4 +326,22 @@ void free_sounds_struct(Sounds sounds)
 	Mix_FreeChunk(sounds.winEffect);
 
 	Mix_FreeChunk(sounds.loseEffect);
+}
+
+void free_images_struct(Images images)
+{
+	for(uint8_t index = 0; index < 8; index += 1)
+	{
+		SDL_FreeSurface(images.nextSymbols[index]);
+	}
+
+	SDL_FreeSurface(images.mineSymbol);
+
+	SDL_FreeSurface(images.flagSymbol);
+
+	SDL_FreeSurface(images.intactSquare);
+
+	SDL_FreeSurface(images.blastSquare);
+
+	SDL_FreeSurface(images.sweptSquare);
 }
