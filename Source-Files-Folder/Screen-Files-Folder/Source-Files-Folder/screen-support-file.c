@@ -84,6 +84,8 @@ bool render_mine_field(Screen screen, Field field, Board board, Images images)
 {
 	SDL_RenderClear(screen.render);
 
+	render_field_ground(screen, images);
+
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
     for(int wIndex = 0; wIndex < board.width; wIndex += 1)
@@ -248,10 +250,8 @@ bool render_screen_text(Screen screen, char text[], Color color, int width, int 
 	return true;
 }
 
-bool render_board_options(Screen screen)
+bool board_options_position(Rect* positions, int amount, Screen screen)
 {
-	SDL_RenderClear(screen.render);
-
 	int relativeBoardWidth = 100;
 	int relativeBoardHeight = 200;
 
@@ -274,17 +274,31 @@ bool render_board_options(Screen screen)
 	int boardHeight = (relativeBoardHeight * sizeFactor);
 	int boardWidth = (relativeBoardWidth * sizeFactor);
 
-	Rect stupidPosition = {width + 0, height, boardWidth, boardHeight};
+	for(int index = 0; index < amount; index += 1)
+	{
+		positions[index] = (Rect) {width + (index * boardWidth) + (index * boardMargin * boardWidth), height, boardWidth, boardHeight};
+	}
 
-	Rect normalPosition = {width + boardWidth + (boardMargin * boardWidth), height, boardWidth, boardHeight};
+	return true;
+}
 
-	Rect expertPosition = {width + (2 * boardWidth) + (2 * boardMargin * boardWidth), height, boardWidth, boardHeight};
+bool render_board_options(Screen screen, Images images)
+{
+	SDL_RenderClear(screen.render);
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", stupidPosition);
+	render_board_ground(screen, images);
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", normalPosition);
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", expertPosition);
+	Rect positions[3];
+
+	board_options_position(positions, 3, screen);
+
+
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", positions[0]);
+
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", positions[1]);
+
+	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", positions[2]);
 
 	return true;
 }
@@ -499,8 +513,24 @@ bool setup_images_struct(Images* images)
   extract_file_image(&images->intactSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/intact-square.png");
   extract_file_image(&images->blastSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/blast-square.png");
   extract_file_image(&images->sweptSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/swept-square.png");
+	extract_file_image(&images->fieldGround, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/field-ground.png");
+	extract_file_image(&images->boardGround, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/board-ground.png");
 
 	return true;
+}
+
+bool render_field_ground(Screen screen, Images images)
+{
+	Rect position = {0, 0, screen.width, screen.height};
+
+	return render_screen_image(screen, images.fieldGround, position);
+}
+
+bool render_board_ground(Screen screen, Images images)
+{
+	Rect position = {0, 0, screen.width, screen.height};
+
+	return render_screen_image(screen, images.boardGround, position);
 }
 
 bool setup_screen_structs(Screen* screen, char title[], int width, int height, Images* images, Sounds* sounds)

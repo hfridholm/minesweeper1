@@ -24,7 +24,7 @@ bool render_screen_text(Screen, char[], Color, int, int, float);
 
 bool extract_file_font(Font**, char[], int);
 
-bool render_board_options(Screen);
+bool render_board_options(Screen, Images);
 
 bool extract_file_image(Surface**, char[]);
 
@@ -49,5 +49,11 @@ bool point_input_handler(Field, Board, Input, Point, Sounds);
 bool render_result_message(Screen, Sounds, Result);
 
 bool setup_screen_structs(Screen*, char[], int, int, Images*, Sounds*);
+
+bool render_field_ground(Screen, Images);
+
+bool render_board_ground(Screen, Images);
+
+bool board_options_position(Rect*, int, Screen);
 
 #endif

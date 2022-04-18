@@ -53,7 +53,7 @@ int main(int argAmount, char* arguments[])
 
   Board board;
 
-  if(!input_screen_board(&board, &screen))
+  if(!input_screen_board(&board, &screen, images))
   {
     printf("could not input board!\n");
 

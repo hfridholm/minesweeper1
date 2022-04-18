@@ -37,6 +37,8 @@ typedef struct Images
   Image* blastSquare;
   Image* sweptSquare;
   Image* intactSquare;
+  Image* boardGround;
+  Image* fieldGround;
 } Images;
 
 typedef struct Sounds

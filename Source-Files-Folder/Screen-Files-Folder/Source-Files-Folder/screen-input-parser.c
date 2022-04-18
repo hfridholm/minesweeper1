@@ -1,7 +1,7 @@
 
 #include "../Header-Files-Folder/screen-include-file.h"
 
-bool input_screen_board(Board* board, Screen* screen)
+bool input_screen_board(Board* board, Screen* screen, Images images)
 {
   Board inputBoard = {0, 0, 0};
 
@@ -9,7 +9,7 @@ bool input_screen_board(Board* board, Screen* screen)
 
   while(inputBoard.width <= 0 || inputBoard.height <= 0 || inputBoard.mines <= 0)
   {
-    if(!render_board_options(*screen)) return false;
+    if(!render_board_options(*screen, images)) return false;
 
     SDL_RenderPresent(screen->render);
 
