@@ -75,16 +75,26 @@ void free_screen_struct(Screen screen)
 	SDL_DestroyWindow(screen.window);
 
 	SDL_Quit();
-	IMG_Quit();
-  TTF_Quit();
-  Mix_Quit();
 }
 
-bool render_mine_field(Screen screen, Field field, Board board, Images images)
+bool render_mine_field(GUI gui, Field field, Board board, Stats stats)
 {
-	SDL_RenderClear(screen.render);
+	SDL_RenderClear(gui.screen.render);
 
-	render_field_ground(screen, images);
+	render_field_ground(gui);
+
+	char timeText[200];
+	Color color = {128, 128, 128};
+
+	sprintf(timeText, "Time: %ld", (stats.stopClock - stats.startClock));
+
+	int width, height;
+
+	text_true_dimensions(&width, &height, timeText, gui.fonts.timeFont);
+
+	Rect position = {10, 10, width * 2, height * 2};
+
+	render_screen_text(gui.screen, timeText, gui.fonts.timeFont, color, position);
 
   for(int hIndex = 0; hIndex < board.height; hIndex += 1)
   {
@@ -93,7 +103,7 @@ bool render_mine_field(Screen screen, Field field, Board board, Images images)
       Square square = field[hIndex][wIndex];
       Point point = {hIndex, wIndex};
 
-      if(!render_field_square(screen, board, point, square, images))
+      if(!render_field_square(gui, board, point, square))
       {
         printf("Could not render_field_square!\n");
 
@@ -104,19 +114,19 @@ bool render_mine_field(Screen screen, Field field, Board board, Images images)
   return true;
 }
 
-bool render_field_square(Screen screen, Board board, Point point, Square square, Images images)
+bool render_field_square(GUI gui, Board board, Point point, Square square)
 {
 	Image* squareImage = NULL;
 	Image* symbolImage = NULL;
 
-	if(!extract_square_image(&squareImage, square, images))
+	if(!extract_square_image(&squareImage, square, gui.images))
   {
     printf("Could not extract_square_image!\n");
 
     return false;
   }
 
-	if(!extract_symbol_image(&symbolImage, square, images))
+	if(!extract_symbol_image(&symbolImage, square, gui.images))
 	{
 		printf("Could not extract_symbol_image\n");
 
@@ -125,19 +135,19 @@ bool render_field_square(Screen screen, Board board, Point point, Square square,
 
   Rect position;
 
-  if(!screen_field_point(&position, screen, board, point))
+  if(!screen_field_point(&position, gui.screen, board, point))
   {
     return false;
   }
 
-  if(!render_screen_image(screen, squareImage, position))
+  if(!render_screen_image(gui.screen, squareImage, position))
   {
     return false;
   }
 
 	if(symbolImage != NULL)
 	{
-		if(!render_screen_image(screen, symbolImage, position))
+		if(!render_screen_image(gui.screen, symbolImage, position))
 		{
 			return false;
 		}
@@ -217,35 +227,16 @@ bool extract_file_font(Font** font, char filePath[], int size)
 #define FONT_FILE "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf"
 #define FONT_SIZE 24
 
-bool render_screen_text(Screen screen, char text[], Color color, int width, int height, float size)
+bool render_screen_text(Screen screen, char text[], Font* font, Color color, Rect position)
 {
-	Font* textFont = NULL;
-
-	if(!extract_file_font(&textFont, (char*) FONT_FILE, FONT_SIZE))
-	{
-		printf("Could not extract font!\n");
-		return false;
-	}
-
-	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(textFont, text, color);
+	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text, color);
 
 	SDL_Texture* message = SDL_CreateTextureFromSurface(screen.render, surfaceMessage);
-
-	float widthRel = ((float) screen.width / (float) surfaceMessage->w);
-	float heightRel = ((float) screen.height / (float) surfaceMessage->h);
-	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
-
-	int textHeight = surfaceMessage->h * sizeFactor;
-	int textWidth = surfaceMessage->w * sizeFactor;
-
-	Rect position = {width - textWidth / 2, height - textHeight / 2, textWidth, textHeight};
 
 	SDL_RenderCopy(screen.render, message, NULL, &position);
 
 	SDL_FreeSurface(surfaceMessage);
 	SDL_DestroyTexture(message);
-
-	TTF_CloseFont(textFont);
 
 	return true;
 }
@@ -282,23 +273,23 @@ bool board_options_position(Rect* positions, int amount, Screen screen)
 	return true;
 }
 
-bool render_board_options(Screen screen, Images images)
+bool render_board_options(GUI gui)
 {
-	SDL_RenderClear(screen.render);
+	SDL_RenderClear(gui.screen.render);
 
-	render_board_ground(screen, images);
+	render_board_ground(gui);
 
 
 	Rect positions[3];
 
-	board_options_position(positions, 3, screen);
+	board_options_position(positions, 3, gui.screen);
 
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", positions[0]);
+	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", positions[0]);
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", positions[1]);
+	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", positions[1]);
 
-	render_file_image(screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", positions[2]);
+	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", positions[2]);
 
 	return true;
 }
@@ -347,6 +338,8 @@ void free_sounds_struct(Sounds sounds)
 	Mix_FreeChunk(sounds.winEffect);
 
 	Mix_FreeChunk(sounds.loseEffect);
+
+	Mix_Quit();
 }
 
 void free_images_struct(Images images)
@@ -365,67 +358,120 @@ void free_images_struct(Images images)
 	SDL_FreeSurface(images.blastSquare);
 
 	SDL_FreeSurface(images.sweptSquare);
+
+	IMG_Quit();
 }
 
-void free_screen_structs(Screen screen, Images images, Sounds sounds)
+void free_fonts_struct(Fonts fonts)
 {
-	free_screen_struct(screen);
+	TTF_CloseFont(fonts.timeFont);
 
-	free_images_struct(images);
-
-	free_sounds_struct(sounds);
+	TTF_Quit();
 }
 
-bool render_result_screen(Screen screen, Images images, Sounds sounds, Field field, Board board, Result result)
+void free_gui_struct(GUI gui)
 {
-	if(!render_mine_field(screen, field, board, images))
+	free_screen_struct(gui.screen);
+
+	free_images_struct(gui.images);
+
+	free_sounds_struct(gui.sounds);
+
+	free_fonts_struct(gui.fonts);
+}
+
+bool render_result_screen(GUI gui, Field field, Board board, Stats stats, Result result)
+{
+	if(!render_mine_field(gui, field, board, stats))
 	{
 		printf("Could not render_mine_field!\n");
 
 		return false;
 	}
 
-	if(!render_result_message(screen, sounds, result))
+	if(!render_result_message(gui, result))
 	{
 		printf("Could not render_result_message\n");
 		return false;
 	}
 
-	SDL_RenderPresent(screen.render);
+	SDL_RenderPresent(gui.screen.render);
 
 	return true;
 }
 
-bool render_result_message(Screen screen, Sounds sounds, Result result)
+bool text_true_dimensions(int* width, int* height, char text[], Font* font)
 {
+	SDL_Surface* surface = TTF_RenderText_Solid(font, text, (Color) {255, 255, 255});
+
+	*width = surface->w;
+	*height = surface->h;
+
+	SDL_FreeSurface(surface);
+
+	return true;
+}
+
+bool result_message_position(Rect* position, char message[], GUI gui)
+{
+	int trueWidth, trueHeight;
+
+	text_true_dimensions(&trueWidth, &trueHeight, message, gui.fonts.timeFont);
+
+	float widthRel = ((float) gui.screen.width / (float) trueWidth);
+	float heightRel = ((float) gui.screen.height / (float) trueHeight);
+	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
+
+	int width = (gui.screen.width - (sizeFactor * trueWidth)) / 2;
+	int height = (gui.screen.height - (sizeFactor * trueHeight)) / 2;
+
+	*position = (Rect) {width, height, sizeFactor * trueWidth, sizeFactor * trueHeight};
+
+	return true;
+}
+
+bool render_result_message(GUI gui, Result result)
+{
+	Rect position;
+
+	char text[200];
+
 	if(result == RESULT_WIN)
 	{
 		Color color = {0, 200, 0};
 
-		if(!render_screen_text(screen, "You Won!", color, screen.width / 2, screen.height / 2, 5))
+		sprintf(text, "You Won!");
+
+		result_message_position(&position, text, gui);
+
+		if(!render_screen_text(gui.screen, text, gui.fonts.timeFont, color, position))
 		{
 			printf("Could not render text result!\n");
 		}
 
-		Mix_PlayChannel(-1, sounds.winEffect, 0);
+		Mix_PlayChannel(-1, gui.sounds.winEffect, 0);
 	}
 	else if(result == RESULT_LOSE)
 	{
 		Color color = {128, 8, 0};
 
-		if(!render_screen_text(screen, "You Lost!", color, screen.width / 2, screen.height / 2, 5))
+		sprintf(text, "You Lost!");
+
+		result_message_position(&position, text, gui);
+
+		if(!render_screen_text(gui.screen, text, gui.fonts.timeFont, color, position))
 		{
 			printf("Could not render text result!\n");
 		}
 
-		Mix_PlayChannel(-1, sounds.loseEffect, 0);
+		Mix_PlayChannel(-1, gui.sounds.loseEffect, 0);
 	}
 	return true;
 }
 
-bool game_result_handler(Screen screen, Images images, Sounds sounds, Field field, Board board, Result result)
+bool game_result_handler(Field field, Board board, Stats stats, Result result, GUI* gui)
 {
-	render_result_screen(screen, images, sounds, field, board, result);
+	render_result_screen(*gui, field, board, stats, result);
 
 	Event event;
 
@@ -437,22 +483,22 @@ bool game_result_handler(Screen screen, Images images, Sounds sounds, Field fiel
 	return true;
 }
 
-bool game_action_handler(Field field, Board board, Screen* screen, Images images, Sounds sounds)
+bool game_action_handler(Field field, Board board, Stats* stats, GUI* gui)
 {
-	if(!render_mine_field(*screen, field, board, images))
+	if(!render_mine_field(*gui, field, board, *stats))
 	{
 		printf("Could not render_mine_field!\n");
 
 		return false;
 	}
 
-	SDL_RenderPresent(screen->render);
+	SDL_RenderPresent(gui->screen.render);
 
 	Point point = {-1, -1};
 
-	Input inputEvent = input_screen_point(&point, screen, field, board, images);
+	Input inputEvent = input_screen_point(&point, field, board, stats, gui);
 
-	if(!point_input_handler(field, board, inputEvent, point, sounds))
+	if(!point_input_handler(field, board, inputEvent, point, *gui))
 	{
 		return false;
 	}
@@ -460,7 +506,7 @@ bool game_action_handler(Field field, Board board, Screen* screen, Images images
 	return true;
 }
 
-bool point_input_handler(Field field, Board board, Input inputEvent, Point point, Sounds sounds)
+bool point_input_handler(Field field, Board board, Input inputEvent, Point point, GUI gui)
 {
 	if(inputEvent == INPUT_QUIT)
 	{
@@ -470,7 +516,7 @@ bool point_input_handler(Field field, Board board, Input inputEvent, Point point
 	{
 		if(unlock_field_square(field, board, point))
 		{
-			Mix_PlayChannel(-1, sounds.unlockEffect, 0);
+			Mix_PlayChannel(-1, gui.sounds.unlockEffect, 0);
 		}
 		else printf("Could not unlock_field_square!\n");
 	}
@@ -478,7 +524,7 @@ bool point_input_handler(Field field, Board board, Input inputEvent, Point point
 	{
 		if(flag_field_square(field, board, point))
 		{
-			Mix_PlayChannel(-1, sounds.flagEffect, 0);
+			Mix_PlayChannel(-1, gui.sounds.flagEffect, 0);
 		}
 		else printf("Could not flag_field_square!\n");
 	}
@@ -491,6 +537,16 @@ bool setup_sounds_struct(Sounds* sounds)
   sounds->flagEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-flag-sound.wav");
   sounds->winEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/win-result-sound.wav");
   sounds->loseEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/lose-result-sound.wav");
+
+	return true;
+}
+
+bool setup_fonts_struct(Fonts* fonts)
+{
+	if(!extract_file_font(&fonts->timeFont, "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf", 24))
+	{
+		printf("Could not extract font\n");
+	}
 
 	return true;
 }
@@ -519,46 +575,60 @@ bool setup_images_struct(Images* images)
 	return true;
 }
 
-bool render_field_ground(Screen screen, Images images)
+bool render_field_ground(GUI gui)
 {
-	Rect position = {0, 0, screen.width, screen.height};
+	Rect position = {0, 0, gui.screen.width, gui.screen.height};
 
-	return render_screen_image(screen, images.fieldGround, position);
+	return render_screen_image(gui.screen, gui.images.fieldGround, position);
 }
 
-bool render_board_ground(Screen screen, Images images)
+bool render_board_ground(GUI gui)
 {
-	Rect position = {0, 0, screen.width, screen.height};
+	Rect position = {0, 0, gui.screen.width, gui.screen.height};
 
-	return render_screen_image(screen, images.boardGround, position);
+	return render_screen_image(gui.screen, gui.images.boardGround, position);
 }
 
-bool setup_screen_structs(Screen* screen, char title[], int width, int height, Images* images, Sounds* sounds)
+bool setup_gui_struct(GUI* gui, char title[], int width, int height)
 {
-	if(!setup_screen_struct(screen, title, width, height))
+	if(!setup_screen_struct(&gui->screen, title, width, height))
   {
     printf("Could not setup_display_screen!\n");
 
     return false;
   }
-	if(!setup_sounds_struct(sounds))
+	if(!setup_sounds_struct(&gui->sounds))
   {
     printf("Could not setup_sounds_struct\n");
 
-		free_screen_struct(*screen);
+		free_screen_struct(gui->screen);
 
 		return false;
   }
 
-  if(!setup_images_struct(images))
+  if(!setup_images_struct(&gui->images))
   {
 		printf("Could not setup_images_struct\n");
 
-		free_screen_struct(*screen);
+		free_screen_struct(gui->screen);
 
-		free_sounds_struct(*sounds);
+		free_sounds_struct(gui->sounds);
 
 		return false;
   }
+
+	if(!setup_fonts_struct(&gui->fonts))
+	{
+		printf("Could not setup_fonts_struct\n");
+
+		free_screen_struct(gui->screen);
+
+		free_sounds_struct(gui->sounds);
+
+		free_images_struct(gui->images);
+
+		return false;
+	}
+
 	return true;
 }

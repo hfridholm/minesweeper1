@@ -15,8 +15,15 @@ typedef struct Point
 
 typedef struct Board
 {
-  int height, width, mines;
+  int height, width, mines, flags;
 } Board;
+
+typedef struct Stats
+{
+  int flags;
+  long startClock;
+  long stopClock;
+} Stats;
 
 typedef enum Result
 {

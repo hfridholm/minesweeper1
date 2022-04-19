@@ -24,11 +24,11 @@ bool game_still_running(Result* result, Field field, Board board)
   return true;
 }
 
-bool mine_sweeper_game(Result* result, Field field, Board board, Screen* screen, Images images, Sounds sounds)
+bool mine_sweeper_game(Result* result, Field field, Board board, Stats* stats, GUI* gui)
 {
   while(game_still_running(result, field, board))
   {
-    if(!game_action_handler(field, board, screen, images, sounds))
+    if(!game_action_handler(field, board, stats, gui))
     {
       return false;
     }
@@ -40,11 +40,9 @@ int main(int argAmount, char* arguments[])
 {
   srand(time(NULL));
 
-  Screen screen;
-  Images images;
-  Sounds sounds;
+  GUI gui;
 
-  if(!setup_screen_structs(&screen, "minesweeper", 1280, 720, &images, &sounds))
+  if(!setup_gui_struct(&gui, "minesweeper", 1280, 720))
   {
     printf("Could not setup_screen_structs\n");
 
@@ -53,11 +51,11 @@ int main(int argAmount, char* arguments[])
 
   Board board;
 
-  if(!input_screen_board(&board, &screen, images))
+  if(!input_screen_board(&board, &gui))
   {
     printf("could not input board!\n");
 
-    free_screen_structs(screen, images, sounds);
+    free_gui_struct(gui);
 
     return false;
   }
@@ -69,23 +67,30 @@ int main(int argAmount, char* arguments[])
     printf("Could not generate field!\n");
 
     free_mine_field(field, board);
-    free_screen_structs(screen, images, sounds);
+    free_gui_struct(gui);
 
     return false;
   }
 
+  Stats stats = {0, time(NULL), time(NULL)};
+
   Result result;
 
-  if(mine_sweeper_game(&result, field, board, &screen, images, sounds))
+  if(mine_sweeper_game(&result, field, board, &stats, &gui))
   {
-    game_result_handler(screen, images, sounds, field, board, result);
+    game_result_handler(field, board, stats, result, &gui);
   }
 
   printf("free_screen_structs(screen, images, sounds);\n");
   printf("free_mine_field(field, board);\n");
 
   free_mine_field(field, board);
-  free_screen_structs(screen, images, sounds);
+
+  printf("freed mine field\n");
+
+  free_gui_struct(gui);
+
+  printf("freed gui\n");
 
   return false;
 }

@@ -49,4 +49,17 @@ typedef struct Sounds
   Effect* loseEffect;
 } Sounds;
 
+typedef struct Fonts
+{
+  Font* timeFont;
+} Fonts;
+
+typedef struct GUI
+{
+  Screen screen;
+  Images images;
+  Sounds sounds;
+  Fonts fonts;
+} GUI;
+
 #endif
