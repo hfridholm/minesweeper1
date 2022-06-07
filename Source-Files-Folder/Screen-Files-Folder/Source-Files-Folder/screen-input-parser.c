@@ -101,30 +101,27 @@ Input input_screen_point(Point* point, Field mineField, Board board, Stats* stat
   return inputEvent;
 }
 
+#define NUMBER_IN_BOUNDS(NUMBER, MINIMUM, MAXIMUM) (NUMBER >= MINIMUM && NUMBER <= MAXIMUM)
+
 bool parse_board_input(Board* board, Event event, Screen screen)
 {
-  uint16_t relativeBoardWidth = 100;
-	uint16_t relativeBoardHeight = 200;
+  Rect positions[3];
 
-	float boardMargin = 0.1;
+  board_options_position(positions, 3, screen);
 
-	uint16_t relativeTotalWidth = ((relativeBoardWidth * 3) + (boardMargin * relativeBoardWidth * 2));
-	uint16_t relativeTotalHeight = relativeBoardHeight;
+  int inputBoard = 0;
 
-	float widthRel = ((float) screen.width / (float) relativeTotalWidth);
-	float heightRel = ((float) screen.height / (float) relativeTotalHeight);
+  for(int index = 0; index < 3; index += 1)
+  {
+    if(NUMBER_IN_BOUNDS(event.motion.x, positions[index].x, positions[index].x + positions[index].w) &&
+      NUMBER_IN_BOUNDS(event.motion.y, positions[index].y, positions[index].y + positions[index].h))
+    {
+      inputBoard = index + 1;
+      break;
+    }
+  }
 
-	float sizeFactor = (widthRel < heightRel) ? widthRel : heightRel;
 
-	uint16_t totalWidth = relativeTotalWidth * sizeFactor;
-
-	uint16_t boardWidth = (relativeBoardWidth * sizeFactor);
-
-	uint16_t width = (screen.width - totalWidth) / 2;
-
-  uint16_t relativeInputWidth = (event.motion.x - width);
-
-  uint8_t inputBoard = ceil((relativeInputWidth - (2 * boardMargin * boardWidth)) / boardWidth);
 
   printf("inputBoard: %d\n", inputBoard);
 

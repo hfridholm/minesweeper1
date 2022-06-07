@@ -243,8 +243,8 @@ bool render_screen_text(Screen screen, char text[], Font* font, Color color, Rec
 
 bool board_options_position(Rect* positions, int amount, Screen screen)
 {
-	int relativeBoardWidth = 100;
-	int relativeBoardHeight = 200;
+	int relativeBoardWidth = 73;
+	int relativeBoardHeight = 86;
 
 	float boardMargin = 0.1;
 
@@ -287,7 +287,7 @@ bool render_board_options(GUI gui)
 
 	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", positions[0]);
 
-	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.jpeg", positions[1]);
+	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.png", positions[1]);
 
 	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", positions[2]);
 
