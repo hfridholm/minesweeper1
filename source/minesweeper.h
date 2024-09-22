@@ -13,6 +13,8 @@
 #include <math.h>
 #include <time.h>
 
+#include "debug.h"
+
 #include "minesweeper/field-engine-structs.h"
 #include "minesweeper/mine-field-handler.h"
 

@@ -31,6 +31,44 @@ bool game_still_running(Result* result, Field field, Board board)
   return true;
 }
 
+
+bool game_result_handler(Field field, Board board, Stats stats, Result result, GUI* gui)
+{
+	render_result_screen(*gui, field, board, stats, result);
+
+	Event event;
+
+	while(event.type != SDL_QUIT)
+	{
+		SDL_WaitEvent(&event);
+	}
+
+	return true;
+}
+
+bool game_action_handler(Field field, Board board, Stats* stats, GUI* gui)
+{
+	if(!render_mine_field(*gui, field, board, *stats))
+	{
+		printf("Could not render_mine_field!\n");
+
+		return false;
+	}
+
+	SDL_RenderPresent(gui->screen.render);
+
+	Point point = {-1, -1};
+
+	Input inputEvent = input_screen_point(&point, field, board, stats, gui);
+
+	if(!point_input_handler(field, board, inputEvent, point, *gui))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool mine_sweeper_game(Result* result, Field field, Board board, Stats* stats, GUI* gui)
 {
   while(game_still_running(result, field, board))
@@ -45,6 +83,8 @@ bool mine_sweeper_game(Result* result, Field field, Board board, Stats* stats, G
 
 int main(int argAmount, char* arguments[])
 {
+  info_print("Start of main");
+
   srand(time(NULL));
 
   GUI gui;
@@ -88,16 +128,11 @@ int main(int argAmount, char* arguments[])
     game_result_handler(field, board, stats, result, &gui);
   }
 
-  printf("free_screen_structs(screen, images, sounds);\n");
-  printf("free_mine_field(field, board);\n");
-
   free_mine_field(field, board);
-
-  printf("freed mine field\n");
 
   free_gui_struct(gui);
 
-  printf("freed gui\n");
+  info_print("End of main");
 
   return false;
 }

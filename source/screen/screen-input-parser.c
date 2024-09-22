@@ -1,6 +1,44 @@
+/*
+ * Written by Hampus Fridholm
+ *
+ * Last updated: 2024-09-22
+ */
 
 #include "../screen.h"
 
+#include "screen-intern.h"
+
+/*
+ * Perform an action based on how the user clicked on what square
+ */
+bool point_input_handler(Field field, Board board, Input inputEvent, Point point, GUI gui)
+{
+	if(inputEvent == INPUT_QUIT)
+	{
+		return false;
+	}
+	else if(inputEvent == INPUT_UNLOCK)
+	{
+		if(unlock_field_square(field, board, point))
+		{
+			Mix_PlayChannel(-1, gui.sounds.unlockEffect, 0);
+		}
+		else printf("Could not unlock_field_square!\n");
+	}
+	else if(inputEvent == INPUT_FLAG)
+	{
+		if(flag_field_square(field, board, point))
+		{
+			Mix_PlayChannel(-1, gui.sounds.flagEffect, 0);
+		}
+		else printf("Could not flag_field_square!\n");
+	}
+	return true;
+}
+
+/*
+ * Let the user choose which difficulty to play
+ */
 bool input_screen_board(Board* board, GUI* gui)
 {
   Board inputBoard = {0, 0, 0};
@@ -43,6 +81,9 @@ bool input_screen_board(Board* board, GUI* gui)
   return true;
 }
 
+/*
+ * Register which minefield square the user clicks on
+ */
 Input input_screen_point(Point* point, Field mineField, Board board, Stats* stats, GUI* gui)
 {
   Point inputPoint = {-1, -1};
@@ -103,6 +144,9 @@ Input input_screen_point(Point* point, Field mineField, Board board, Stats* stat
 
 #define NUMBER_IN_BOUNDS(NUMBER, MINIMUM, MAXIMUM) (NUMBER >= MINIMUM && NUMBER <= MAXIMUM)
 
+/*
+ * Check which difficulty the user wants to play
+ */
 bool parse_board_input(Board* board, Event event, Screen screen)
 {
   Rect positions[3];
@@ -145,7 +189,11 @@ bool parse_board_input(Board* board, Event event, Screen screen)
   return true;
 }
 
-// Instead of Event, use only Event.motion
+/*
+ * Parse which minefield square the user hovers over
+ *
+ * Instead of Event, use only Event.motion
+ */
 Point parse_mouse_point(Event event, Screen screen, Board board)
 {
   const int squareHeight = (screen.height / board.height);

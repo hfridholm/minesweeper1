@@ -1,6 +1,15 @@
+/*
+ * Written by Hampus Fridholm
+ *
+ * Last updated: 2024-09-22
+ */
 
-#ifndef SCREEN_SUPPORT_FILE_H
-#define SCREEN_SUPPORT_FILE_H
+#ifndef SCREEN_INTERN_H
+#define SCREEN_INTERN_H
+
+Point parse_mouse_point(Event, Screen, Board);
+
+bool parse_board_input(Board*, Event, Screen);
 
 bool make_screen_window(Window**, char[], int, int);
 
@@ -11,8 +20,6 @@ bool setup_screen_struct(Screen*, char[], int, int);
 void free_screen_struct(Screen);
 
 bool render_field_square(GUI, Board, Point, Square);
-
-bool render_mine_field(GUI, Field, Board, Stats);
 
 bool extract_square_image(Image**, Square, Images);
 
@@ -36,19 +43,7 @@ void free_sounds_struct(Sounds);
 
 void free_images_struct(Images);
 
-void free_gui_struct(GUI);
-
-bool render_result_screen(GUI, Field, Board, Stats, Result);
-
-bool game_result_handler(Field, Board, Stats, Result, GUI*);
-
-bool game_action_handler(Field, Board, Stats*, GUI*);
-
-bool point_input_handler(Field, Board, Input, Point, GUI);
-
 bool render_result_message(GUI, Result);
-
-bool setup_gui_struct(GUI*, char[], int, int);
 
 bool render_field_ground(GUI);
 
@@ -64,4 +59,4 @@ void free_fonts_struct(Fonts);
 
 bool setup_fonts_struct(Fonts*);
 
-#endif
+#endif // SCREEN_INTERN_H

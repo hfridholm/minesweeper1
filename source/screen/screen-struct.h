@@ -1,6 +1,11 @@
+/*
+ * Written by Hampus Fridholm
+ *
+ * Last updated: 2024-09-22
+ */
 
-#ifndef FIELD_SCREEN_STRUCTS_H
-#define FIELD_SCREEN_STRUCTS_H
+#ifndef SCREEN_STRUCT_H
+#define SCREEN_STRUCT_H
 
 typedef SDL_Window   Window;
 typedef SDL_Renderer Render;
@@ -62,4 +67,16 @@ typedef struct GUI
   Fonts fonts;
 } GUI;
 
-#endif
+#define SCREEN_IMAGE_FOLDER "../assets/images"
+
+#define INTACT_SQUARE_FILE "intact-square.png"
+#define SWEPT_SQUARE_FILE "swept-square.png"
+#define BLAST_SQUARE_FILE "blast-square.png"
+
+#define MINE_SYMBOL_FILE "mine-symbol.png"
+#define FLAG_SYMBOL_FILE "flag-symbol.png"
+
+#define FONT_FILE "../assets/fonts/8Bit-font.ttf"
+#define FONT_SIZE 24
+
+#endif // SCREEN_STRUCT_H
