@@ -11,7 +11,7 @@
 /*
  * Get the position and size of difficulty option banner
  */
-bool board_options_position(Rect* positions, int amount, Screen screen)
+bool board_options_position(SDL_Rect* positions, int amount, Screen screen)
 {
 	int relativeBoardWidth = 73;
 	int relativeBoardHeight = 86;
@@ -37,13 +37,13 @@ bool board_options_position(Rect* positions, int amount, Screen screen)
 
 	for(int index = 0; index < amount; index += 1)
 	{
-		positions[index] = (Rect) {width + (index * boardWidth) + (index * boardMargin * boardWidth), height, boardWidth, boardHeight};
+		positions[index] = (SDL_Rect) {width + (index * boardWidth) + (index * boardMargin * boardWidth), height, boardWidth, boardHeight};
 	}
 
 	return true;
 }
 
-bool extract_file_image(Surface** image, char filePath[])
+bool extract_file_image(SDL_Surface** image, char filePath[])
 {
 	*image = IMG_Load(filePath);
 
@@ -53,7 +53,7 @@ bool extract_file_image(Surface** image, char filePath[])
 /*
  * Get which symbol that should be displayed at the specified minefield square
  */
-bool extract_symbol_image(Image** image, Square square, Images images)
+bool extract_symbol_image(SDL_Surface** image, Square square, Images images)
 {
 	if(square.visable && square.mine)
   {
@@ -73,7 +73,7 @@ bool extract_symbol_image(Image** image, Square square, Images images)
 /*
  * Get which background image that should be displayed at the specified minefield square
  */
-bool extract_square_image(Image** image, Square square, Images images)
+bool extract_square_image(SDL_Surface** image, Square square, Images images)
 {
 	if(square.visable && square.mine)
   {
@@ -92,7 +92,7 @@ bool extract_square_image(Image** image, Square square, Images images)
 	return true;
 }
 
-bool extract_file_font(Font** font, char filePath[], int size)
+bool extract_file_font(TTF_Font** font, char filePath[], int size)
 {
 	*font = TTF_OpenFont(filePath, size);
 
@@ -100,9 +100,9 @@ bool extract_file_font(Font** font, char filePath[], int size)
 }
 
 
-bool render_file_image(Screen screen, char filePath[], Rect position)
+bool render_file_image(Screen screen, char filePath[], SDL_Rect position)
 {
-	Surface* image;
+	SDL_Surface* image;
 
 	if(!extract_file_image(&image, filePath))
 	{
@@ -112,16 +112,16 @@ bool render_file_image(Screen screen, char filePath[], Rect position)
 	return render_screen_image(screen, image, position);
 }
 
-bool make_surface_texture(Texture** texture, Render* render, Surface* surface)
+bool make_surface_texture(SDL_Texture** texture, SDL_Renderer* render, SDL_Surface* surface)
 {
   *texture = SDL_CreateTextureFromSurface(render, surface);
 
 	return (texture != NULL);
 }
 
-bool render_screen_image(Screen screen, Surface* image, Rect position)
+bool render_screen_image(Screen screen, SDL_Surface* image, SDL_Rect position)
 {
-	Texture* texture = NULL;
+	SDL_Texture* texture = NULL;
 
 	if(!make_surface_texture(&texture, screen.render, image))
 	{
@@ -136,7 +136,7 @@ bool render_screen_image(Screen screen, Surface* image, Rect position)
 }
 
 /*
- * Render the different difficulty option banners
+ * SDL_Renderer the different difficulty option banners
  */
 bool render_board_options(GUI gui)
 {
@@ -145,7 +145,7 @@ bool render_board_options(GUI gui)
 	render_board_ground(gui);
 
 
-	Rect positions[3];
+	SDL_Rect positions[3];
 
 	board_options_position(positions, 3, gui.screen);
 
@@ -160,9 +160,9 @@ bool render_board_options(GUI gui)
 }
 
 /*
- * Render text on the screen
+ * SDL_Renderer text on the screen
  */
-bool render_screen_text(Screen screen, char text[], Font* font, Color color, Rect position)
+bool render_screen_text(Screen screen, char text[], TTF_Font* font, SDL_Color color, SDL_Rect position)
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text, color);
 
@@ -177,7 +177,7 @@ bool render_screen_text(Screen screen, char text[], Font* font, Color color, Rec
 }
 
 /*
- * Render the minefield
+ * SDL_Renderer the minefield
  */
 bool render_mine_field(GUI gui, Field field, Board board, Stats stats)
 {
@@ -186,7 +186,7 @@ bool render_mine_field(GUI gui, Field field, Board board, Stats stats)
 	render_field_ground(gui);
 
 	char timeText[200];
-	Color color = {128, 128, 128};
+	SDL_Color color = {128, 128, 128};
 
 	sprintf(timeText, "Time: %ld", (stats.stopClock - stats.startClock));
 
@@ -194,7 +194,7 @@ bool render_mine_field(GUI gui, Field field, Board board, Stats stats)
 
 	text_true_dimensions(&width, &height, timeText, gui.fonts.timeFont);
 
-	Rect position = {10, 10, width * 2, height * 2};
+	SDL_Rect position = {10, 10, width * 2, height * 2};
 
 	render_screen_text(gui.screen, timeText, gui.fonts.timeFont, color, position);
 
@@ -217,12 +217,12 @@ bool render_mine_field(GUI gui, Field field, Board board, Stats stats)
 }
 
 /*
- * Render a square in the minefield
+ * SDL_Renderer a square in the minefield
  */
 bool render_field_square(GUI gui, Board board, Point point, Square square)
 {
-	Image* squareImage = NULL;
-	Image* symbolImage = NULL;
+	SDL_Surface* squareImage = NULL;
+	SDL_Surface* symbolImage = NULL;
 
 	if(!extract_square_image(&squareImage, square, gui.images))
   {
@@ -238,7 +238,7 @@ bool render_field_square(GUI gui, Board board, Point point, Square square)
 		return false;
 	}
 
-  Rect position;
+  SDL_Rect position;
 
   if(!screen_field_point(&position, gui.screen, board, point))
   {
@@ -263,7 +263,7 @@ bool render_field_square(GUI gui, Board board, Point point, Square square)
 /*
  * Get the position and size of a square in the minefield
  */
-bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
+bool screen_field_point(SDL_Rect* position, Screen screen, Board board, Point point)
 {
   if(!point_inside_board(point, board)) return false;
 
@@ -284,27 +284,27 @@ bool screen_field_point(Rect* position, Screen screen, Board board, Point point)
 	int height = (heightBlank + relativeHeight);
   int width = (widthBlank + relativeWidth);
 
-  *position = (Rect) {width, height, squareLength, squareLength};
+  *position = (SDL_Rect) {width, height, squareLength, squareLength};
 
   return true;
 }
 
 bool render_field_ground(GUI gui)
 {
-	Rect position = {0, 0, gui.screen.width, gui.screen.height};
+	SDL_Rect position = {0, 0, gui.screen.width, gui.screen.height};
 
 	return render_screen_image(gui.screen, gui.images.fieldGround, position);
 }
 
 bool render_board_ground(GUI gui)
 {
-	Rect position = {0, 0, gui.screen.width, gui.screen.height};
+	SDL_Rect position = {0, 0, gui.screen.width, gui.screen.height};
 
 	return render_screen_image(gui.screen, gui.images.boardGround, position);
 }
 
 /*
- * Render the minefield and the result message
+ * SDL_Renderer the minefield and the result message
  */
 bool render_result_screen(GUI gui, Field field, Board board, Stats stats, Result result)
 {
@@ -326,9 +326,9 @@ bool render_result_screen(GUI gui, Field field, Board board, Stats stats, Result
 	return true;
 }
 
-bool text_true_dimensions(int* width, int* height, char text[], Font* font)
+bool text_true_dimensions(int* width, int* height, char text[], TTF_Font* font)
 {
-	SDL_Surface* surface = TTF_RenderText_Solid(font, text, (Color) {255, 255, 255});
+	SDL_Surface* surface = TTF_RenderText_Solid(font, text, (SDL_Color) {255, 255, 255});
 
 	*width = surface->w;
 	*height = surface->h;
@@ -338,7 +338,7 @@ bool text_true_dimensions(int* width, int* height, char text[], Font* font)
 	return true;
 }
 
-bool result_message_position(Rect* position, char message[], GUI gui)
+bool result_message_position(SDL_Rect* position, char message[], GUI gui)
 {
 	int trueWidth, trueHeight;
 
@@ -351,23 +351,23 @@ bool result_message_position(Rect* position, char message[], GUI gui)
 	int width = (gui.screen.width - (sizeFactor * trueWidth)) / 2;
 	int height = (gui.screen.height - (sizeFactor * trueHeight)) / 2;
 
-	*position = (Rect) {width, height, sizeFactor * trueWidth, sizeFactor * trueHeight};
+	*position = (SDL_Rect) {width, height, sizeFactor * trueWidth, sizeFactor * trueHeight};
 
 	return true;
 }
 
 /*
- * Render the result message on the screen
+ * SDL_Renderer the result message on the screen
  */
 bool render_result_message(GUI gui, Result result)
 {
-	Rect position;
+	SDL_Rect position;
 
 	char text[200];
 
 	if(result == RESULT_WIN)
 	{
-		Color color = {0, 200, 0};
+		SDL_Color color = {0, 200, 0};
 
 		sprintf(text, "You Won!");
 
@@ -382,7 +382,7 @@ bool render_result_message(GUI gui, Result result)
 	}
 	else if(result == RESULT_LOSE)
 	{
-		Color color = {128, 8, 0};
+		SDL_Color color = {128, 8, 0};
 
 		sprintf(text, "You Lost!");
 

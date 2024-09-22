@@ -7,20 +7,6 @@
 #ifndef SCREEN_STRUCT_H
 #define SCREEN_STRUCT_H
 
-typedef SDL_Window   Window;
-typedef SDL_Renderer Render;
-typedef SDL_Surface  Surface;
-typedef SDL_Texture  Texture;
-typedef SDL_Rect     Rect;
-typedef SDL_Color    Color;
-typedef SDL_Event    Event;
-typedef SDL_Surface  Image;
-
-typedef TTF_Font     Font;
-
-typedef Mix_Chunk    Effect;
-typedef Mix_Music    Music;
-
 typedef enum Input
 {
   INPUT_NONE, INPUT_QUIT, INPUT_UNLOCK, INPUT_FLAG
@@ -28,35 +14,35 @@ typedef enum Input
 
 typedef struct Screen
 {
-  Window* window;
-  Render* render;
+  SDL_Window* window;
+  SDL_Renderer* render;
   uint16_t width;
   uint16_t height;
 } Screen;
 
 typedef struct Images
 {
-  Image* nextSymbols[8];
-  Image* mineSymbol;
-  Image* flagSymbol;
-  Image* blastSquare;
-  Image* sweptSquare;
-  Image* intactSquare;
-  Image* boardGround;
-  Image* fieldGround;
+  SDL_Surface* nextSymbols[8];
+  SDL_Surface* mineSymbol;
+  SDL_Surface* flagSymbol;
+  SDL_Surface* blastSquare;
+  SDL_Surface* sweptSquare;
+  SDL_Surface* intactSquare;
+  SDL_Surface* boardGround;
+  SDL_Surface* fieldGround;
 } Images;
 
 typedef struct Sounds
 {
-  Effect* unlockEffect;
-  Effect* flagEffect;
-  Effect* winEffect;
-  Effect* loseEffect;
+  Mix_Chunk* unlockEffect;
+  Mix_Chunk* flagEffect;
+  Mix_Chunk* winEffect;
+  Mix_Chunk* loseEffect;
 } Sounds;
 
 typedef struct Fonts
 {
-  Font* timeFont;
+  TTF_Font* timeFont;
 } Fonts;
 
 typedef struct GUI

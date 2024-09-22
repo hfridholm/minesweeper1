@@ -36,7 +36,7 @@ bool game_result_handler(Field field, Board board, Stats stats, Result result, G
 {
 	render_result_screen(*gui, field, board, stats, result);
 
-	Event event;
+	SDL_Event event;
 
 	while(event.type != SDL_QUIT)
 	{

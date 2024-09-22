@@ -43,7 +43,7 @@ bool input_screen_board(Board* board, GUI* gui)
 {
   Board inputBoard = {0, 0, 0};
 
-  Event event;
+  SDL_Event event;
 
   while(inputBoard.width <= 0 || inputBoard.height <= 0 || inputBoard.mines <= 0)
   {
@@ -90,7 +90,7 @@ Input input_screen_point(Point* point, Field mineField, Board board, Stats* stat
 
   Input inputEvent = INPUT_NONE;
 
-  Event event;
+  SDL_Event event;
 
   while(!point_inside_board(inputPoint, board))
   {
@@ -147,9 +147,9 @@ Input input_screen_point(Point* point, Field mineField, Board board, Stats* stat
 /*
  * Check which difficulty the user wants to play
  */
-bool parse_board_input(Board* board, Event event, Screen screen)
+bool parse_board_input(Board* board, SDL_Event event, Screen screen)
 {
-  Rect positions[3];
+  SDL_Rect positions[3];
 
   board_options_position(positions, 3, screen);
 
@@ -192,9 +192,9 @@ bool parse_board_input(Board* board, Event event, Screen screen)
 /*
  * Parse which minefield square the user hovers over
  *
- * Instead of Event, use only Event.motion
+ * Instead of SDL_Event, use only SDL_Event.motion
  */
-Point parse_mouse_point(Event event, Screen screen, Board board)
+Point parse_mouse_point(SDL_Event event, Screen screen, Board board)
 {
   const int squareHeight = (screen.height / board.height);
   const int squareWidth = (screen.width / board.width);

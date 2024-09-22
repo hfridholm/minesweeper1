@@ -59,7 +59,7 @@ bool setup_screen_struct(Screen* screen, char title[], int width, int height)
 	return true;
 }
 
-bool make_screen_window(Window** window, char title[], int width, int height)
+bool make_screen_window(SDL_Window** window, char title[], int width, int height)
 {
   *window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
