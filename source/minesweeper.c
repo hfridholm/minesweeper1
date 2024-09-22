@@ -1,5 +1,12 @@
+/*
+ * minesweeper
+ *
+ * Written by Hampus Fridholm
+ *
+ * Last updated: 2024-09-22
+ */
 
-#include "../Header-Files-Folder/master-include-file.h"
+#include "minesweeper.h"
 
 bool game_still_running(Result* result, Field field, Board board)
 {

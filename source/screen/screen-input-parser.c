@@ -1,5 +1,5 @@
 
-#include "../Header-Files-Folder/screen-include-file.h"
+#include "../screen.h"
 
 bool input_screen_board(Board* board, GUI* gui)
 {

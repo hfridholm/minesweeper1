@@ -2,7 +2,7 @@
 #ifndef FIELD_SCREEN_DEFINES_H
 #define FIELD_SCREEN_DEFINES_H
 
-#define SCREEN_IMAGE_FOLDER "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder"
+#define SCREEN_IMAGE_FOLDER "../assets/images"
 
 #define INTACT_SQUARE_FILE "intact-square.png"
 #define SWEPT_SQUARE_FILE "swept-square.png"

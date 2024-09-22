@@ -1,5 +1,5 @@
 
-#include "../Header-Files-Folder/engine-include-file.h"
+#include "../minesweeper.h"
 
 bool mine_field_cleared(Field field, Board board)
 {

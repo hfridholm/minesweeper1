@@ -1,5 +1,5 @@
 
-#include "../Header-Files-Folder/screen-include-file.h"
+#include "../screen.h"
 
 bool setup_screen_struct(Screen* screen, char title[], int width, int height)
 {
@@ -224,7 +224,7 @@ bool extract_file_font(Font** font, char filePath[], int size)
 	return (*font != NULL);
 }
 
-#define FONT_FILE "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf"
+#define FONT_FILE "../assets/fonts/8Bit-font.ttf"
 #define FONT_SIZE 24
 
 bool render_screen_text(Screen screen, char text[], Font* font, Color color, Rect position)
@@ -285,11 +285,11 @@ bool render_board_options(GUI gui)
 	board_options_position(positions, 3, gui.screen);
 
 
-	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/stupid-board.png", positions[0]);
+	render_file_image(gui.screen, "../assets/images/stupid-board.png", positions[0]);
 
-	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/normal-board.png", positions[1]);
+	render_file_image(gui.screen, "../assets/images/normal-board.png", positions[1]);
 
-	render_file_image(gui.screen, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/expert-board.png", positions[2]);
+	render_file_image(gui.screen, "../assets/images/expert-board.png", positions[2]);
 
 	return true;
 }
@@ -533,17 +533,17 @@ bool point_input_handler(Field field, Board board, Input inputEvent, Point point
 
 bool setup_sounds_struct(Sounds* sounds)
 {
-	sounds->unlockEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-click-sound.wav");
-  sounds->flagEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/square-flag-sound.wav");
-  sounds->winEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/win-result-sound.wav");
-  sounds->loseEffect = Mix_LoadWAV("../Source-Files-Folder/Screen-Files-Folder/Screen-Sounds-Folder/lose-result-sound.wav");
+	sounds->unlockEffect = Mix_LoadWAV("../assets/sounds/square-click-sound.wav");
+  sounds->flagEffect = Mix_LoadWAV("../assets/sounds/square-flag-sound.wav");
+  sounds->winEffect = Mix_LoadWAV("../assets/sounds/win-result-sound.wav");
+  sounds->loseEffect = Mix_LoadWAV("../assets/sounds/lose-result-sound.wav");
 
 	return true;
 }
 
 bool setup_fonts_struct(Fonts* fonts)
 {
-	if(!extract_file_font(&fonts->timeFont, "../Source-Files-Folder/Screen-Files-Folder/Screen-Fonts-Folder/8Bit-font.ttf", 24))
+	if(!extract_file_font(&fonts->timeFont, "../assets/fonts/8Bit-font.ttf", 24))
 	{
 		printf("Could not extract font\n");
 	}
@@ -564,13 +564,13 @@ bool setup_images_struct(Images* images)
     extract_file_image(&images->nextSymbols[index], filePath);
   }
 
-  extract_file_image(&images->mineSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/mine-symbol.png");
-  extract_file_image(&images->flagSymbol, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/flag-symbol.png");
-  extract_file_image(&images->intactSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/intact-square.png");
-  extract_file_image(&images->blastSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/blast-square.png");
-  extract_file_image(&images->sweptSquare, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/swept-square.png");
-	extract_file_image(&images->fieldGround, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/field-ground.png");
-	extract_file_image(&images->boardGround, "../Source-Files-Folder/Screen-Files-Folder/Screen-Images-Folder/board-ground.png");
+  extract_file_image(&images->mineSymbol, "../assets/images/mine-symbol.png");
+  extract_file_image(&images->flagSymbol, "../assets/images/flag-symbol.png");
+  extract_file_image(&images->intactSquare, "../assets/images/intact-square.png");
+  extract_file_image(&images->blastSquare, "../assets/images/blast-square.png");
+  extract_file_image(&images->sweptSquare, "../assets/images/swept-square.png");
+	extract_file_image(&images->fieldGround, "../assets/images/field-ground.png");
+	extract_file_image(&images->boardGround, "../assets/images/board-ground.png");
 
 	return true;
 }
